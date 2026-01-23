@@ -3,7 +3,7 @@ import pygame
 class MainMenu:
     def __init__(self, screen):
         self.screen = screen
-        self.options = ["开始冒险", "游戏设置", "退出游戏"]
+        self.options = ["开始冒险", "加载存档", "游戏设置", "退出游戏"]
         self.selected_index = 0
         self.sfx_callback = None  # 用于播放音效的回调函数
         
@@ -23,15 +23,6 @@ class MainMenu:
         # 字体
         self.font = pygame.font.SysFont("SimHei", 40)
         self.title_font = pygame.font.SysFont("SimHei", 80)
-
-    def set_sfx_callback(self, callback):
-        """设置音效回调函数"""
-        self.sfx_callback = callback
-
-    def play_button_sound(self):
-        """播放按钮音效"""
-        if self.sfx_callback:
-            self.sfx_callback("button")
 
     def draw(self):
         # 2. 先绘制背景
@@ -61,6 +52,15 @@ class MainMenu:
             x = 400 - option_surf.get_width()//2
             y = 300 + i * 60
             self.screen.blit(option_surf, (x, y))
+
+    def set_sfx_callback(self, callback):
+        """设置音效回调函数"""
+        self.sfx_callback = callback
+
+    def play_button_sound(self):
+        """播放按钮音效"""
+        if self.sfx_callback:
+            self.sfx_callback("button")
 
     def update_selection(self, direction):
         self.selected_index = (self.selected_index + direction) % len(self.options)
