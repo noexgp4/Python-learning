@@ -15,6 +15,8 @@
         "fullscreen": "Fullscreen",
         "window": "Windowed",
         "save": "Save Settings",
-        "reset": "Reset Defaults"
+        "reset": "Reset Defaults",
+        "tips": "↑↓ Select  ← → Adjust  Enter Confirm  ESC Back",
+        "arrows": "< >"
     }
 }

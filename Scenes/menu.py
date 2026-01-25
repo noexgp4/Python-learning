@@ -1,6 +1,7 @@
 import pygame
 from Language.language_manager import LanguageManager
-from Scenes.Text import UIConfig
+from Scenes.text import UIConfig, Label
+from Scenes.UIManager import UIManager
 
 class MainMenu:
     def __init__(self, screen, language_manager):
@@ -14,6 +15,9 @@ class MainMenu:
         ]
         self.selected_index = 0
         self.sfx_callback = None  # 用于播放音效的回调函数
+        
+        # UI管理器
+        self.ui_manager = UIManager(self.screen)
         
         # 1. 加载并处理背景图
         try:
@@ -52,29 +56,33 @@ class MainMenu:
         overlay.fill((0, 0, 0, 100)) 
         self.screen.blit(overlay, (0, 0))
 
-        # 4. 绘制标题（加一个简单的阴影效果）
+        self.ui_manager.clear()
+        
         # 4. 绘制标题（加一个简单的阴影效果）
         title_text = "像素勇者"
-        shadow = UIConfig.render_text(title_text, "title", (0, 0, 0))
-        title = UIConfig.render_text(title_text, "title", (255, 215, 0))
-        
-        # 先画阴影（偏移 4 像素），再画主体
-        title_x = screen_width // 2 - title.get_width() // 2
+        title_width = UIConfig.TITLE_FONT.size(title_text)[0]
+        title_x = screen_width // 2 - title_width // 2
         title_y = int(screen_height * 0.1)
-        self.screen.blit(shadow, (title_x + 4, title_y + 4))
-        self.screen.blit(title, (title_x, title_y))
         
-        # 5. 循环绘制选项
+        # 阴影
+        self.ui_manager.add_component(Label(title_x + 4, title_y + 4, title_text, "title", (0, 0, 0)))
+        # 主体
+        self.ui_manager.add_component(Label(title_x, title_y, title_text, "title", UIConfig.COLOR_MENU_TITLE))
+        
+        # 5. 循环添加选项
         for i, option_key in enumerate(self.options):
             text = self.language_manager.get_text("menu", option_key)
-            color = (255, 255, 0) if i == self.selected_index else (255, 255, 255)
+            color = UIConfig.COLOR_HIGHLIGHT if i == self.selected_index else UIConfig.COLOR_WHITE
             display_text = f"> {text}" if i == self.selected_index else text
             
-            # 使用 UIConfig 绘制
-            option_surf = UIConfig.render_text(display_text, "normal", color)
-            x = screen_width // 2 - option_surf.get_width() // 2
+            # 使用 Label 组件
+            text_size = UIConfig.NORMAL_FONT.size(display_text)
+            x = screen_width // 2 - text_size[0] // 2
             y = int(screen_height * 0.35) + i * 60
-            self.screen.blit(option_surf, (x, y))
+            self.ui_manager.add_component(Label(x, y, display_text, "normal", color))
+
+        # 6. 执行画出
+        self.ui_manager.draw()
     
     def _scale_to_fit(self, image, target_width, target_height):
         """按宽高比缩放图片，不失真"""

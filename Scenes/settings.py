@@ -2,7 +2,8 @@ import pygame
 import json
 import os
 import os
-from Scenes.Text import UIConfig, Button
+from Scenes.text import UIConfig, Button, Label, ProgressBar, SelectBox
+from Scenes.UIManager import UIManager
 
 class SettingsScene:
     
@@ -48,6 +49,9 @@ class SettingsScene:
         # 3. 菜单选择项
         # 0: 背景音乐, 1: 音效, 2: 语言, 3: 分辨率, 4: 全屏, 5: 保存, 6: 恢复默认
         self.selected_item = 0
+        
+        # 4. 初始化UI管理器
+        self.ui_manager = UIManager(self.screen)
 
     def load_config(self):
         """从文件读取音量和显示设置"""
@@ -178,6 +182,12 @@ class SettingsScene:
             self.temp_resolution_index = (self.temp_resolution_index + direction) % len(self.RESOLUTIONS)
         elif self.selected_item == 4:  # 全屏切换
             self.temp_is_fullscreen = not self.temp_is_fullscreen
+        elif self.selected_item == 5: # 保存按钮
+            if direction > 0: # 向右切换到恢复默认
+                self.selected_item = 6
+        elif self.selected_item == 6: # 恢复默认按钮
+            if direction < 0: # 向左切换到保存
+                self.selected_item = 5
 
     def update_selection(self, direction):
         """更新菜单选择（0-6共7项）"""
@@ -199,171 +209,120 @@ class SettingsScene:
 
     def draw(self):
         screen_width, screen_height = self.screen.get_size()
-        self.screen.fill((40, 40, 40))
+        self.screen.fill(UIConfig.COLOR_SCREEN_BG)
+        self.ui_manager.clear() # 每一帧清空，重新构建UI组件树
         
-        # 绘制标题
-        # title_font = pygame.font.SysFont("SimHei", 60)
+        # 1. 绘制标题
         title_text_str = self.language_manager.get_text("settings", "title")
-        title_text = UIConfig.render_text(title_text_str, "title", (255, 215, 0))
-        self.screen.blit(title_text, (screen_width//2 - title_text.get_width()//2, int(screen_height * 0.02)))
+        title_width = UIConfig.TITLE_FONT.size(title_text_str)[0]
+        self.ui_manager.add_component(Label(
+            screen_width//2 - title_width//2, 
+            int(screen_height * 0.02), 
+            title_text_str, 
+            "title", 
+            UIConfig.COLOR_SETTINGS_TITLE
+        ))
         
-        # 绘制各个设置项
+        # 2. 绘制各个设置项
         y_offset = int(screen_height * 0.12)
-        item_spacing = int(screen_height * 0.15)
+        item_spacing = int(screen_height * 0.13)
         
         # 背景音乐音量
-        self._draw_volume_control(y_offset, self.language_manager.get_text("settings", "bgm"), self.temp_bgm_volume, 0)
+        self._add_volume_ui(y_offset, self.language_manager.get_text("settings", "bgm"), self.temp_bgm_volume, 0)
         y_offset += item_spacing
         
         # 音效音量
-        self._draw_volume_control(y_offset, self.language_manager.get_text("settings", "sfx"), self.temp_sfx_volume, 1)
+        self._add_volume_ui(y_offset, self.language_manager.get_text("settings", "sfx"), self.temp_sfx_volume, 1)
         y_offset += item_spacing
         
-        # 语言选择 (放在音效下面)
-        self._draw_language_control(y_offset, 2)
-        y_offset += item_spacing - int(screen_height * 0.03)
+        # 语言选择
+        self._add_selectbox_ui(y_offset, self.language_manager.get_text("settings", "language"), 2)
+        y_offset += item_spacing
 
         # 分辨率选择
-        self._draw_resolution_control(y_offset, 3)
-        y_offset += item_spacing - int(screen_height * 0.03)
+        self._add_selectbox_ui(y_offset, self.language_manager.get_text("settings", "resolution"), 3)
+        y_offset += item_spacing
         
         # 全屏切换
-        self._draw_fullscreen_control(y_offset, 4)
-        y_offset += item_spacing - int(screen_height * 0.03)
+        self._add_selectbox_ui(y_offset, self.language_manager.get_text("settings", "display"), 4)
+        y_offset += item_spacing
         
-        # 保存和恢复按钮
-        self._draw_button(y_offset, self.language_manager.get_text("settings", "save"), 5)
-        y_offset += int(screen_height * 0.08)
-        self._draw_button(y_offset, self.language_manager.get_text("settings", "reset"), 6)
+        # 3. 绘制保存和恢复按钮
+        button_width = int(screen_width * 0.25)
+        center_x = screen_width // 2
+        btn_spacing = 40
+        save_x = center_x - button_width - btn_spacing // 2
+        reset_x = center_x + btn_spacing // 2
         
-        # 绘制提示文字
-        # tip_font = pygame.font.SysFont("SimHei", 20)
-        tip_text = UIConfig.render_text("↑↓ 选择  ← → 调节  Enter 确认  ESC 返回", "small", (200, 200, 200))
-        self.screen.blit(tip_text, (screen_width//2 - tip_text.get_width()//2, screen_height - 40))
+        self._add_button_ui(y_offset, self.language_manager.get_text("settings", "save"), 5, save_x, button_width)
+        self._add_button_ui(y_offset, self.language_manager.get_text("settings", "reset"), 6, reset_x, button_width)
+        
+        # 4. 绘制底部提示
+        tip_text = self.language_manager.get_text("settings", "tips")
+        tip_width = UIConfig.SMALL_FONT.size(tip_text)[0]
+        self.ui_manager.add_component(Label(
+            screen_width//2 - tip_width//2,
+            screen_height - 40,
+            tip_text,
+            "small",
+            UIConfig.COLOR_SETTINGS_TIPS
+        ))
 
-    def _draw_volume_control(self, y_pos, label, volume, item_id):
-        """绘制音量控制条"""
-        screen_width, screen_height = self.screen.get_size()
-        label_color = (255, 255, 0) if self.selected_item == item_id else (255, 255, 255)
-        is_selected = self.selected_item == item_id
-        
-        # 绘制标签
-        label_text = UIConfig.render_text(label, "normal", label_color)
-        self.screen.blit(label_text, (int(screen_width * 0.05), y_pos))
-        
-        # 绘制音量控制条
-        bar_x = int(screen_width * 0.35)
-        bar_y = y_pos + 5
-        bar_width = int(screen_width * 0.4)
-        bar_height = 35
-        
-        # 边框颜色
-        border_color = (100, 200, 255) if is_selected else (100, 100, 100)
-        pygame.draw.rect(self.screen, border_color, (bar_x, bar_y, bar_width, bar_height), 3)
-        
-        # 填充条
-        fill_width = int(bar_width * volume)
-        pygame.draw.rect(self.screen, (100, 200, 255), (bar_x, bar_y, fill_width, bar_height))
-        
-        # 百分比文字
-        vol_text = UIConfig.render_text(f"{int(volume * 100)}%", "normal", (255, 255, 0))
-        self.screen.blit(vol_text, (bar_x + bar_width + int(screen_width * 0.03), bar_y + bar_height//2 - vol_text.get_height()//2))
+        # 5. 执行统一绘制
+        self.ui_manager.draw()
 
-    def _draw_resolution_control(self, y_pos, item_id):
-        """绘制分辨率选择"""
+    def _add_volume_ui(self, y_pos, label, volume, item_id):
+        """向任务管理器添加音量控制UI"""
         screen_width, screen_height = self.screen.get_size()
         is_selected = self.selected_item == item_id
-        label_color = (255, 255, 0) if is_selected else (255, 255, 255)
+        label_color = UIConfig.COLOR_SETTINGS_ACTIVE if is_selected else UIConfig.COLOR_SETTINGS_TEXT
         
-        # 绘制标签
-        label_text_str = self.language_manager.get_text("settings", "resolution")
-        label_text = UIConfig.render_text(label_text_str, "normal", label_color)
-        self.screen.blit(label_text, (int(screen_width * 0.05), y_pos))
+        # 添加标签
+        self.ui_manager.add_component(Label(int(screen_width * 0.15), y_pos, label, "normal", label_color))
         
-        # 绘制分辨率选项
-        res_text = f"{self.RESOLUTIONS[self.temp_resolution_index][0]}x{self.RESOLUTIONS[self.temp_resolution_index][1]}"
-        res_color = (100, 200, 255) if is_selected else (200, 200, 200)
-        res_display = UIConfig.render_text(res_text, "normal", res_color)
+        # 添加进度条
+        bar_x = int(screen_width * 0.45)
+        self.ui_manager.add_component(ProgressBar(bar_x, y_pos + 5, int(screen_width * 0.4), 35, volume, is_selected))
         
-        # 绘制选择框
-        box_x = int(screen_width * 0.35)
-        box_y = y_pos
-        box_width = int(screen_width * 0.4)
-        box_height = 40
-        
-        border_color = (100, 200, 255) if is_selected else (100, 100, 100)
-        pygame.draw.rect(self.screen, border_color, (box_x, box_y, box_width, box_height), 3)
-        if is_selected:
-            pygame.draw.rect(self.screen, (50, 150, 200), (box_x, box_y, box_width, box_height))
-        
-        self.screen.blit(res_display, (box_x + box_width//2 - res_display.get_width()//2, box_y + box_height//2 - res_display.get_height()//2))
-        
-        # 绘制箭头提示
-        arrow_text = UIConfig.render_text("< >", "small", (150, 150, 150))
-        self.screen.blit(arrow_text, (box_x + box_width + int(screen_width * 0.03), box_y + box_height//2 - arrow_text.get_height()//2))
+        # 添加百分比
+        vol_text = f"{int(volume * 100)}%"
+        self.ui_manager.add_component(Label(bar_x + int(screen_width * 0.4) + int(screen_width * 0.03), y_pos, vol_text, "normal", UIConfig.COLOR_WHITE))
 
-    def _draw_fullscreen_control(self, y_pos, item_id):
-        """绘制全屏选择"""
+    def _add_selectbox_ui(self, y_pos, label, item_id):
+        """向任务管理器添加选择框UI"""
         screen_width, screen_height = self.screen.get_size()
         is_selected = self.selected_item == item_id
-        label_color = (255, 255, 0) if is_selected else (255, 255, 255)
+        label_color = UIConfig.COLOR_SETTINGS_ACTIVE if is_selected else UIConfig.COLOR_SETTINGS_TEXT
         
-        # 绘制标签
-        label_text_str = self.language_manager.get_text("settings", "display")
-        label_text = UIConfig.render_text(label_text_str, "normal", label_color)
-        self.screen.blit(label_text, (int(screen_width * 0.05), y_pos))
+        # 添加标签
+        self.ui_manager.add_component(Label(int(screen_width * 0.15), y_pos, label, "normal", label_color))
         
-        # 绘制全屏状态
-        mode_text = self.language_manager.get_text("settings", "fullscreen") if self.temp_is_fullscreen else self.language_manager.get_text("settings", "window")
-        mode_color = (100, 200, 255) if is_selected else (200, 200, 200)
-        mode_display = UIConfig.render_text(mode_text, "normal", mode_color)
-        
-        # 绘制选择框
-        box_x = int(screen_width * 0.35)
-        box_y = y_pos
-        box_width = int(screen_width * 0.4)
-        box_height = 40
-        
-        border_color = (100, 200, 255) if is_selected else (100, 100, 100)
-        pygame.draw.rect(self.screen, border_color, (box_x, box_y, box_width, box_height), 3)
-        if is_selected:
-            pygame.draw.rect(self.screen, (50, 150, 200), (box_x, box_y, box_width, box_height))
-        
-        self.screen.blit(mode_display, (box_x + box_width//2 - mode_display.get_width()//2, box_y + box_height//2 - mode_display.get_height()//2))
-        
-        # 绘制提示
-        tip_text = UIConfig.render_text("← → 切换", "small", (150, 150, 150))
-        self.screen.blit(tip_text, (box_x + box_width + int(screen_width * 0.03), box_y + box_height//2 - tip_text.get_height()//2))
+        # 确定显示文本
+        display_text = ""
+        if item_id == 2: # 语言
+            lang_map = {"zh": "中文", "en": "English"}
+            display_text = lang_map.get(self.temp_language, self.temp_language)
+        elif item_id == 3: # 分辨率
+            display_text = f"{self.RESOLUTIONS[self.temp_resolution_index][0]}x{self.RESOLUTIONS[self.temp_resolution_index][1]}"
+        elif item_id == 4: # 全屏
+            display_text = "全屏" if self.temp_is_fullscreen else "窗口"
+            if self.language_manager.language == "en":
+                display_text = "Fullscreen" if self.temp_is_fullscreen else "Window"
 
-    def _draw_button(self, y_pos, text, item_id):
-        """绘制按钮"""
-        screen_width, screen_height = self.screen.get_size()
-        
-        # 颜色配置
-        base_color = (100, 100, 100)
-        border_color = (100, 200, 255) if self.selected_item == item_id else (100, 100, 100)
-        selected_color = (50, 150, 200)
-        text_color = (255, 255, 0) if self.selected_item == item_id else (255, 255, 255)
-        
-        # 尺寸
-        button_x = int(screen_width * 0.2)
-        button_width = int(screen_width * 0.6)
-        
-        # 实例化按钮 (即时模式)
-        btn = Button(
-            x=button_x,
-            y=y_pos,
-            width=button_width,
-            height=50,
-            text=text,
-            font=UIConfig.TITLE_FONT if False else UIConfig.NORMAL_FONT, # 使用正常字体
-            base_color=base_color,
-            border_color=border_color,
-            selected_color=selected_color,
-            text_color=text_color
-        )
-        btn.selected = (self.selected_item == item_id)
-        btn.draw(self.screen)
+        # 添加选择框
+        arrows_icon = self.language_manager.get_text("settings", "arrows")
+        self.ui_manager.add_component(SelectBox(int(screen_width * 0.45), y_pos, int(screen_width * 0.4), 40, display_text, is_selected, icon=arrows_icon))
+
+    def _add_button_ui(self, y_pos, text, item_id, x, width):
+        """向任务管理器添加按钮UI"""
+        is_selected = self.selected_item == item_id
+        self.ui_manager.add_component(Button(
+            x, y_pos, width, 50, text, UIConfig.NORMAL_FONT,
+            UIConfig.COLOR_BTN_BASE, 
+            UIConfig.COLOR_BORDER_HIGHLIGHT if is_selected else UIConfig.COLOR_BAR_BORDER,
+            UIConfig.COLOR_HIGHLIGHT_BG,
+            UIConfig.COLOR_SETTINGS_ACTIVE
+        )).selected = is_selected
 
     def get_current_resolution(self):
         """获取当前分辨率"""
@@ -380,37 +339,3 @@ class SettingsScene:
         self.screen = pygame.display.set_mode((width, height), flags)
         print(f"分辨率已改变为 {width}x{height}，全屏: {self.is_fullscreen}")
         return self.screen  # 返回新的屏幕对象
-    def _draw_language_control(self, y_pos, item_id):
-        """绘制语言选择"""
-        screen_width, screen_height = self.screen.get_size()
-        is_selected = self.selected_item == item_id
-        label_color = (255, 255, 0) if is_selected else (255, 255, 255)
-        
-        # 绘制标签
-        label_text_str = self.language_manager.get_text("settings", "language")
-        label_text = UIConfig.render_text(label_text_str, "normal", label_color)
-        self.screen.blit(label_text, (int(screen_width * 0.05), y_pos))
-        
-        # 绘制语言选项
-        lang_map = {"zh": "中文", "en": "English"}
-        display_str = lang_map.get(self.temp_language, self.temp_language)
-        
-        res_color = (100, 200, 255) if is_selected else (200, 200, 200)
-        res_display = UIConfig.render_text(display_str, "normal", res_color)
-        
-        # 绘制选择框
-        box_x = int(screen_width * 0.35)
-        box_y = y_pos
-        box_width = int(screen_width * 0.4)
-        box_height = 40
-        
-        border_color = (100, 200, 255) if is_selected else (100, 100, 100)
-        pygame.draw.rect(self.screen, border_color, (box_x, box_y, box_width, box_height), 3)
-        if is_selected:
-            pygame.draw.rect(self.screen, (50, 150, 200), (box_x, box_y, box_width, box_height))
-        
-        self.screen.blit(res_display, (box_x + box_width//2 - res_display.get_width()//2, box_y + box_height//2 - res_display.get_height()//2))
-        
-        # 绘制箭头提示
-        arrow_text = UIConfig.render_text("< >", "small", (150, 150, 150))
-        self.screen.blit(arrow_text, (box_x + box_width + int(screen_width * 0.03), box_y + box_height//2 - arrow_text.get_height()//2))

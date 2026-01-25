@@ -15,7 +15,9 @@
         "fullscreen": "全屏",
         "window": "窗口",
         "save": "保存设置",
-        "reset": "恢复默认"
+        "reset": "恢复默认",
+        "tips": "↑↓ 选择  ← → 调节  Enter 确认  ESC 返回",
+        "arrows": "< >"
     },
     "battle": {
         "win": "战斗胜利！",
