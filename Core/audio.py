@@ -23,8 +23,8 @@ class SettingsScene:
         # 1. 先尝试加载存档，再初始化
         self.load_config()
         
-        # 2. 资源路径整合 - 使用绝对路径避免相对路径问题
-        self.bgm_path = os.path.join(os.path.dirname(__file__), "Aduio", "music.mp3")
+        # 2. 资源路径整合 - 使用相对路径指向上级 Assets 文件夹
+        self.bgm_path = os.path.join(os.path.dirname(__file__), "..", "Assets", "Aduio", "music.mp3")
         self.sounds = {}
         self.load_all_resources()
         
@@ -118,7 +118,7 @@ class SettingsScene:
 
         # 加载按钮音效
         try:
-            sound_path = os.path.join(os.path.dirname(__file__), "Aduio", "Sound.wav")
+            sound_path = os.path.join(os.path.dirname(__file__), "..", "Assets", "Aduio", "Sound.wav")
             print(f"尝试加载按钮音效: {sound_path}")
             print(f"文件存在: {os.path.exists(sound_path)}")
             self.sounds["button"] = pygame.mixer.Sound(sound_path)
@@ -224,30 +224,3 @@ class SettingsScene:
         button_text = self.font.render(text, True, text_color)
         self.screen.blit(button_text, (400 - button_text.get_width()//2, y_pos + 50//2 - button_text.get_height()//2))
 
-    def load_config(self):
-        """从文件读取音量设置"""
-        if os.path.exists(self.config_file):
-            try:
-                with open(self.config_file, 'r') as f:
-                    data = json.load(f)
-                    return data.get("volume", 0.5)
-            except:
-                return 0.5
-        return 0.5
-
-    def load_all_resources(self):
-        # 加载背景音乐（流式）
-        try:
-            pygame.mixer.music.load(self.bgm_path)
-            pygame.mixer.music.play(-1) # 循环播放
-        except:
-            print("背景音乐加载失败")
-
-        # 加载按钮音效
-        try:
-            sound_path = r"Source\Aduio\Sound.wav"
-            self.sounds["button"] = pygame.mixer.Sound(sound_path)
-            self.sounds["button"].set_volume(self.sfx_volume)
-        except:
-            print("按钮音效加载失败")
-            self.sounds["button"] = None

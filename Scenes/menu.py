@@ -11,12 +11,12 @@ class MainMenu:
         try:
             # 加载图片
             # 修复后
-            original_bg = pygame.image.load("Source/Image/background.png").convert()
+            original_bg = pygame.image.load("Assets/Image/background.png").convert()
             # 缩放到屏幕尺寸 (800x600)
             self.bg_image = pygame.transform.scale(original_bg, (800, 600))
         except:
             # 如果没找到图片，创建一个深蓝色的表面作为备用
-            print("警告：未找到 background.png，将使用默认背景")
+            print("警告：未找到 background.png,将使用默认背景")
             self.bg_image = pygame.Surface((800, 600))
             self.bg_image.fill((20, 20, 40))
 

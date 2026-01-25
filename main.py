@@ -1,7 +1,7 @@
 import pygame
 import sys
-from menu import MainMenu  # 从 menu.py 导入 MainMenu 类
-from settings import SettingsScene  # 导入设置类
+from Scenes.menu import MainMenu  # 从 menu.py 导入 MainMenu 类
+from Core.audio import SettingsScene  # 导入设置类
 
 # 初始化
 pygame.init()
