@@ -1,0 +1,20 @@
+{
+  "timestamp": 1769349033.081504,
+  "time_str": "2026-01-25 21:50:33",
+  "data": {
+    "player_hp": 100,
+    "max_hp": 100,
+    "level": 5,
+    "exp": 0,
+    "gold": 999,
+    "attack": 10,
+    "defense": 5,
+    "current_scene": "Battle",
+    "unlocked_stages": [
+      1
+    ],
+    "inventory": [
+      "Sword"
+    ]
+  }
+}

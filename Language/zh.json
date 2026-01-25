@@ -1,0 +1,24 @@
+{
+    "menu": {
+        "start": "开始游戏",
+        "load": "加载游戏",
+        "settings": "设置",
+        "exit": "退出"
+    },
+    "settings": {
+        "title": "游戏设置",
+        "bgm": "背景音乐",
+        "sfx": "音效",
+        "language": "语言",
+        "resolution": "分辨率",
+        "display": "显示模式",
+        "fullscreen": "全屏",
+        "window": "窗口",
+        "save": "保存设置",
+        "reset": "恢复默认"
+    },
+    "battle": {
+        "win": "战斗胜利！",
+        "lose": "战斗失败！"
+    }
+}

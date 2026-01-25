@@ -1,0 +1,20 @@
+{
+    "menu": {
+        "start": "Start Game",
+        "load": "Load Game",
+        "settings": "Settings",
+        "exit": "Exit"
+    },
+    "settings": {
+        "title": "Settings",
+        "bgm": "BGM",
+        "sfx": "SFX",
+        "language": "Language",
+        "resolution": "Resolution",
+        "display": "Display Mode",
+        "fullscreen": "Fullscreen",
+        "window": "Windowed",
+        "save": "Save Settings",
+        "reset": "Reset Defaults"
+    }
+}
