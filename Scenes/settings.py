@@ -1,7 +1,8 @@
 import pygame
 import json
 import os
-from Scenes.Text import UIConfig
+import os
+from Scenes.Text import UIConfig, Button
 
 class SettingsScene:
     
@@ -337,21 +338,32 @@ class SettingsScene:
     def _draw_button(self, y_pos, text, item_id):
         """绘制按钮"""
         screen_width, screen_height = self.screen.get_size()
-        button_color = (100, 200, 255) if self.selected_item == item_id else (100, 100, 100)
-        is_selected = self.selected_item == item_id
         
-        # 绘制按钮背景
+        # 颜色配置
+        base_color = (100, 100, 100)
+        border_color = (100, 200, 255) if self.selected_item == item_id else (100, 100, 100)
+        selected_color = (50, 150, 200)
+        text_color = (255, 255, 0) if self.selected_item == item_id else (255, 255, 255)
+        
+        # 尺寸
         button_x = int(screen_width * 0.2)
         button_width = int(screen_width * 0.6)
-        button_rect = pygame.Rect(button_x, y_pos, button_width, 50)
-        pygame.draw.rect(self.screen, button_color, button_rect, 3)
-        if is_selected:
-            pygame.draw.rect(self.screen, (50, 150, 200), button_rect)
         
-        # 绘制按钮文字
-        text_color = (255, 255, 0) if is_selected else (255, 255, 255)
-        button_text = UIConfig.render_text(text, "normal", text_color)
-        self.screen.blit(button_text, (screen_width//2 - button_text.get_width()//2, y_pos + 50//2 - button_text.get_height()//2))
+        # 实例化按钮 (即时模式)
+        btn = Button(
+            x=button_x,
+            y=y_pos,
+            width=button_width,
+            height=50,
+            text=text,
+            font=UIConfig.TITLE_FONT if False else UIConfig.NORMAL_FONT, # 使用正常字体
+            base_color=base_color,
+            border_color=border_color,
+            selected_color=selected_color,
+            text_color=text_color
+        )
+        btn.selected = (self.selected_item == item_id)
+        btn.draw(self.screen)
 
     def get_current_resolution(self):
         """获取当前分辨率"""
