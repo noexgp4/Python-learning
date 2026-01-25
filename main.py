@@ -1,19 +1,31 @@
 import pygame
 import sys
 from Scenes.menu import MainMenu  # 从 menu.py 导入 MainMenu 类
-from Core.audio import SettingsScene  # 导入设置类
+from Scenes.settings import SettingsScene  # 导入设置类
 
-# 初始化
+# 初始化 pygame
 pygame.init()
-screen = pygame.display.set_mode((800, 600))
+
+# 先创建一个临时屏幕用于初始化 SettingsScene
+temp_screen = pygame.display.set_mode((800, 600))
+
+# 创建设置实例（会加载保存的分辨率配置）
+settings_scene = SettingsScene(temp_screen)
+
+# 根据加载的分辨率配置创建实际屏幕
+screen = settings_scene.apply_resolution_change()
+
+# 更新屏幕引用
+settings_scene.screen = screen
+pygame.display.set_caption("像素勇者")
+
 clock = pygame.time.Clock() # 控制游戏帧率
 
 # 创建菜单实例
 menu_scene = MainMenu(screen)
-settings_scene = SettingsScene(screen)  # 创建设置实例（会加载背景音乐）
 menu_scene.set_sfx_callback(settings_scene.play_sfx)  # 将音效播放器注入菜单
 current_state = "MENU"
-print(f"游戏初始化完成，当前背景音乐音量: {int(settings_scene.bgm_volume*100)}%")
+print(f"游戏初始化完成，分辨率: {screen.get_size()}，当前背景音乐音量: {int(settings_scene.bgm_volume*100)}%")
 
 def main():
     global current_state
@@ -56,9 +68,11 @@ def main():
                         settings_scene.update_volume(1)   # 增加音量
                     elif event.key == pygame.K_RETURN:    # 按下回车键
                         # 判断选中的是哪个选项
-                        if settings_scene.selected_item == 2:  # 保存设置
+                        if settings_scene.selected_item == 4:  # 保存设置
                             settings_scene.save_config()
-                        elif settings_scene.selected_item == 3:  # 恢复默认
+                            settings_scene.apply_resolution_change()  # 应用分辨率变更
+                            screen = settings_scene.screen  # 更新屏幕对象
+                        elif settings_scene.selected_item == 5:  # 恢复默认
                             settings_scene.reset_to_default()
                     elif event.key == pygame.K_ESCAPE:    # 按 ESC 返回菜单
                         settings_scene.cancel_settings()  # 取消设置改动

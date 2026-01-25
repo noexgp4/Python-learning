@@ -9,15 +9,15 @@ class MainMenu:
         
         # 1. 加载并处理背景图
         try:
-            # 加载图片
-            # 修复后
+            # 加载图片（建议使用 1920x1080 或其他 16:9 比例的高分辨率图）
             original_bg = pygame.image.load("Assets/Image/background.png").convert()
-            # 缩放到屏幕尺寸 (800x600)
-            self.bg_image = pygame.transform.scale(original_bg, (800, 600))
+            self.original_bg = original_bg  # 保存原始图片以供缩放
         except:
             # 如果没找到图片，创建一个深蓝色的表面作为备用
-            print("警告：未找到 background.png,将使用默认背景")
-            self.bg_image = pygame.Surface((800, 600))
+            print("警告：未找到 background.png，将使用默认背景")
+            self.original_bg = None
+            screen_width, screen_height = self.screen.get_size()
+            self.bg_image = pygame.Surface((screen_width, screen_height))
             self.bg_image.fill((20, 20, 40))
 
         # 字体
@@ -25,12 +25,22 @@ class MainMenu:
         self.title_font = pygame.font.SysFont("SimHei", 80)
 
     def draw(self):
-        # 2. 先绘制背景
-        self.screen.blit(self.bg_image, (0, 0))
+        # 2. 先绘制背景（保持宽高比，不变形）
+        screen_width, screen_height = self.screen.get_size()
+        
+        if self.original_bg:
+            # 按宽高比缩放，保持不变形
+            scaled_bg = self._scale_to_fit(self.original_bg, screen_width, screen_height)
+            # 居中显示
+            x_offset = (screen_width - scaled_bg.get_width()) // 2
+            y_offset = (screen_height - scaled_bg.get_height()) // 2
+            self.screen.blit(scaled_bg, (x_offset, y_offset))
+        else:
+            # 使用默认背景
+            self.screen.fill((20, 20, 40))
         
         # 3. 可以在背景上加一层半透明的黑色蒙版，让文字更清晰
-        # 创建一个覆盖全屏的黑色表面，透明度设为 128 (0-255)
-        overlay = pygame.Surface((800, 600), pygame.SRCALPHA)
+        overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 100)) 
         self.screen.blit(overlay, (0, 0))
 
@@ -40,8 +50,10 @@ class MainMenu:
         title = self.title_font.render(title_text, True, (255, 215, 0))
         
         # 先画阴影（偏移 4 像素），再画主体
-        self.screen.blit(shadow, (400 - title.get_width()//2 + 4, 104))
-        self.screen.blit(title, (400 - title.get_width()//2, 100))
+        title_x = screen_width // 2 - title.get_width() // 2
+        title_y = int(screen_height * 0.1)
+        self.screen.blit(shadow, (title_x + 4, title_y + 4))
+        self.screen.blit(title, (title_x, title_y))
         
         # 5. 循环绘制选项
         for i, text in enumerate(self.options):
@@ -49,9 +61,26 @@ class MainMenu:
             display_text = f"> {text}" if i == self.selected_index else text
             
             option_surf = self.font.render(display_text, True, color)
-            x = 400 - option_surf.get_width()//2
-            y = 300 + i * 60
+            x = screen_width // 2 - option_surf.get_width() // 2
+            y = int(screen_height * 0.35) + i * 60
             self.screen.blit(option_surf, (x, y))
+    
+    def _scale_to_fit(self, image, target_width, target_height):
+        """按宽高比缩放图片，不失真"""
+        img_width, img_height = image.get_size()
+        img_ratio = img_width / img_height
+        target_ratio = target_width / target_height
+        
+        if img_ratio > target_ratio:
+            # 图片相对较宽，按高度缩放
+            new_height = target_height
+            new_width = int(new_height * img_ratio)
+        else:
+            # 图片相对较高，按宽度缩放
+            new_width = target_width
+            new_height = int(new_width / img_ratio)
+        
+        return pygame.transform.scale(image, (new_width, new_height))
 
     def set_sfx_callback(self, callback):
         """设置音效回调函数"""

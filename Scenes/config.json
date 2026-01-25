@@ -1,4 +1,6 @@
 {
-  "bgm_volume": 0.0,
-  "sfx_volume": 0.5
+  "bgm_volume": 0.2,
+  "sfx_volume": 0.5,
+  "resolution_index": 0,
+  "is_fullscreen": false
 }
