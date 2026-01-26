@@ -176,3 +176,11 @@ class UIConfig:
             return UIConfig.SMALL_FONT.render(text, antialias, color)
         else:
             return UIConfig.NORMAL_FONT.render(text, antialias, color)
+
+    @staticmethod
+    def draw_center_text(screen, surface, y):
+        """
+        在屏幕水平居中位置绘制已生成的文字表面
+        """
+        x = (screen.get_width() - surface.get_width()) // 2
+        screen.blit(surface, (x, y))

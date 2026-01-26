@@ -5,6 +5,7 @@ from Scenes.settings import SettingsScene  # 导入设置类
 from Core.audio import AudioManager
 from Core.save_system import SaveManager  # 导入存档管理类
 from Core.game_state import GameState # 导入游戏状态类
+from Core.game_config import ClassSelectScene # 导入职业选择类
 
 # 初始化 pygame
 # 初始化 pygame
@@ -40,6 +41,9 @@ menu_scene.set_sfx_callback(audio_manager.play_sfx)  # 将音效播放器注入�
 
 # 创建存档实例
 save_scene = SaveManager(screen) 
+
+# 创建职业选择实例
+class_select_scene = ClassSelectScene(screen)
 
 current_state = "MENU"
 print(f"游戏初始化完成，分辨率: {screen.get_size()}，当前背景音乐音量: {int(settings_scene.bgm_volume*100)}%")
@@ -112,12 +116,26 @@ def main():
                             new_game = GameState()
                             save_scene.save_game(new_game, save_scene.slots[selected_index])
                             save_scene.refresh_slots() # 刷新显示
-                            current_state = "BATTLE" # 进入游戏
+                            current_state = "CLASS_SELECT" # 进入职业选择界面
                         else:
                             # 加载存档
                             print(f"加载槽位 {selected_index + 1} 的存档")
                             # 这里可以添加加载逻辑，比如 game_manager.load(save_scene.slots[selected_index])
                             current_state = "BATTLE"
+                    
+                elif current_state == "CLASS_SELECT":
+                    if event.key == pygame.K_UP:
+                        class_select_scene.update_selection(-1)
+                    elif event.key == pygame.K_DOWN:
+                        class_select_scene.update_selection(1)
+                    elif event.key == pygame.K_RETURN:
+                        # 确认选择职业
+                        selected_class = class_select_scene.class_names[class_select_scene.selected_index]
+                        print(f"已选择职业: {selected_class}")
+                        # TODO: 这里可以将职业属性保存到当前的存档/GameState中
+                        current_state = "BATTLE"
+                    elif event.key == pygame.K_ESCAPE:
+                        current_state = "SAVE_SELECT"
                     
         # 2. 根据状态渲染不同的内容
         if current_state == "MENU":
@@ -128,6 +146,8 @@ def main():
                 save_scene.draw()
         elif current_state == "SETTINGS":
             settings_scene.draw()  # 绘制设置界面
+        elif current_state == "CLASS_SELECT":
+            class_select_scene.draw()  # 绘制职业选择界面
             
         pygame.display.flip()
         clock.tick(60) # 限制每秒 60 帧，防止 CPU 占用过高
