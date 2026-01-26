@@ -154,7 +154,7 @@ class UIConfig:
     # --- 预设字体模板 ---
     # 我们直接在这里生成字体对象
     try:
-        TITLE_FONT = pygame.font.Font(FONT_PATH, 40)
+        TITLE_FONT = pygame.font.Font(FONT_PATH, 50)
         NORMAL_FONT = pygame.font.Font(FONT_PATH, 32)
         SMALL_FONT = pygame.font.Font(FONT_PATH, 20)
     except:
