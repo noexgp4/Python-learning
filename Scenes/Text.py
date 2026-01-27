@@ -20,13 +20,18 @@ class Button:
     def draw(self, screen):
         # 绘制按钮背景
         color = self.selected_color if self.selected else self.base_color
-        pygame.draw.rect(screen, color, (self.x, self.y, self.width, self.height), border_radius=10)  # 圆角矩形
+        pygame.draw.rect(screen, color, (self.x, self.y, self.width, self.height), border_radius=8)  # 圆角矩形
 
         # 绘制边框
-        pygame.draw.rect(screen, self.border_color, (self.x, self.y, self.width, self.height), 3, border_radius=10)  # 边框
+        pygame.draw.rect(screen, self.border_color, (self.x, self.y, self.width, self.height), 3, border_radius=8)  # 边框
 
         # 绘制按钮文字
-        text_surface = self.font.render(self.text, True, self.text_color)  # 白色文字
+        # 优化：如果按钮被选中（背景通常为黄色），文字应变为黑色
+        display_text_color = self.text_color
+        if self.selected:
+            display_text_color = UIConfig.COLOR_PALETTE_BLACK
+            
+        text_surface = self.font.render(self.text, True, display_text_color)
         text_rect = text_surface.get_rect(center=(self.x + self.width // 2, self.y + self.height // 2))
         screen.blit(text_surface, text_rect)
 
@@ -58,18 +63,33 @@ class ProgressBar:
         self.selected = is_selected
 
     def draw(self, screen):
-        # 边框颜色
-        border_color = UIConfig.COLOR_BORDER_HIGHLIGHT if self.selected else UIConfig.COLOR_BAR_BORDER
+        # 1. 确定色块填充颜色 (选中时色块用黄色)
+        fill_color = UIConfig.COLOR_YELLOW
+        
+        # 2. 确定边框色
+        # 逻辑：
+        # - 如果被选中，边框为白色 (提供高对比度焦点)
+        # - 如果未选中，且有进度值，边框跟随色块 (黄色)
+        # - 如果未选中，且无进度值，边框为默认灰色
+        if self.selected:
+            border_color = UIConfig.COLOR_WHITE
+        elif self.progress > 0:
+            border_color = UIConfig.COLOR_YELLOW
+        else:
+            border_color = UIConfig.COLOR_BAR_BORDER_NORMAL
+            
+        border_radius = 8
         
         # 绘制背景槽
-        pygame.draw.rect(screen, UIConfig.COLOR_BAR_BG, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(screen, UIConfig.COLOR_BAR_BG, (self.x, self.y, self.width, self.height), border_radius=border_radius)
+        
+        # 填充进度
+        fill_width = int(self.width * self.progress)
+        if fill_width > 0:
+            pygame.draw.rect(screen, fill_color, (self.x, self.y, fill_width, self.height), border_radius=border_radius)
         
         # 绘制边框
-        pygame.draw.rect(screen, border_color, (self.x, self.y, self.width, self.height), 3)
-        
-        # 填充进度 (使用亮黄色/金黄色)
-        fill_width = int(self.width * self.progress)
-        pygame.draw.rect(screen, UIConfig.COLOR_YELLOW, (self.x, self.y, fill_width, self.height))
+        pygame.draw.rect(screen, border_color, (self.x, self.y, self.width, self.height), 3, border_radius=border_radius)
 
 class SelectBox:
     def __init__(self, x, y, width, height, text, is_selected=False, icon=None):
@@ -84,19 +104,25 @@ class SelectBox:
     def draw(self, screen):
         # 边框颜色
         border_color = UIConfig.COLOR_BORDER_HIGHLIGHT if self.selected else UIConfig.COLOR_BAR_BORDER
+        border_radius = 8
         
         # 绘制背景
-        pygame.draw.rect(screen, border_color, (self.x, self.y, self.width, self.height), 3)
         if self.selected:
-            pygame.draw.rect(screen, UIConfig.COLOR_YELLOW, (self.x, self.y, self.width, self.height))
+            pygame.draw.rect(screen, UIConfig.COLOR_YELLOW, (self.x, self.y, self.width, self.height), border_radius=border_radius)
+        
+        # 绘制边框
+        pygame.draw.rect(screen, border_color, (self.x, self.y, self.width, self.height), 3, border_radius=border_radius)
         
         # 绘制文字
-        text_color = UIConfig.COLOR_SETTINGS_ACTIVE if self.selected else UIConfig.COLOR_SETTINGS_TEXT
+        # 选中时背景为黄色，文字应为黑色；未选中时为默认设置文字颜色
+        text_color = UIConfig.COLOR_PALETTE_BLACK if self.selected else UIConfig.COLOR_SETTINGS_TEXT
+            
         text_surf = UIConfig.render_text(self.text, "normal", text_color)
         screen.blit(text_surf, (self.x + self.width//2 - text_surf.get_width()//2, self.y + self.height//2 - text_surf.get_height()//2))
         
         # 绘制箭头 (使用传入的图标)
-        arrow_surf = UIConfig.render_text(self.icon, "small", UIConfig.COLOR_GRAY)
+        arrow_color = UIConfig.COLOR_PALETTE_BLACK if self.selected else UIConfig.COLOR_GRAY
+        arrow_surf = UIConfig.render_text(self.icon, "small", arrow_color)
         screen.blit(arrow_surf, (self.x + self.width + 20, self.y + self.height//2 - arrow_surf.get_height()//2))
 
 class Panel:
@@ -175,7 +201,9 @@ class UIConfig:
     
     # --- 4. 控件/组件专项 (Widget Styles) ---
     COLOR_BAR_BG = (25, 25, 25)                     # 进度条槽底色 (更深)
-    COLOR_BAR_BORDER = COLOR_PALETTE_GRAY           # 默认边框色
+    COLOR_BAR_BORDER_NORMAL = (100, 100, 100)       # 进度条默认边框色 (中灰色)
+    COLOR_BAR_BORDER_ACTIVE = COLOR_PALETTE_YELLOW  # 进度条选中边框色 (黄色)
+    COLOR_BAR_BORDER = COLOR_PALETTE_GRAY           # 逻辑保留（旧名兼容）
     COLOR_SCREEN_BG = COLOR_PALETTE_SCREEN_BG       # 屏幕全局背景色
     COLOR_PANEL_BG = (30, 30, 30, 220)              # 通用面板底色
     COLOR_BTN_BASE = (50, 50, 50)                   # 按钮默认底色
@@ -209,6 +237,9 @@ class UIConfig:
         一个万能的文字生成器
         type: "title", "normal", "small"
         """
+        # 智能反色逻辑：如果传入的是纯黄色，且我们希望在黄色背景上显示，则这里可以根据场景由调用者决定，
+        # 或者在此处做一个简单的亮度判断（目前按用户要求处理）
+        
         if type == "title":
             return UIConfig.TITLE_FONT.render(text, antialias, color)
         elif type == "small":

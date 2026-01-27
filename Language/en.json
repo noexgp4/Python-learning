@@ -18,5 +18,11 @@
         "reset": "Reset Defaults",
         "tips": "↑↓ Select  ← → Adjust  Enter Confirm  ESC Back",
         "arrows": "< >"
+    },
+    "prompt": {
+        "continue": "SPACE to continue...",
+        "skip": "ESC to skip",
+        "confirm": "Enter to confirm",
+        "back": "Backspace to back"
     }
 }

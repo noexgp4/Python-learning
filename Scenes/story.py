@@ -9,6 +9,7 @@ class StoryScene:
         self.screen = screen
         self.job = job_name
         self.full_text = self._load_json_data("story.json", "intro")
+        self.language_manager = getattr(pygame, 'language_manager', None) # 尝试获取全局语言管理器
         self.ui_manager = UIManager(self.screen)
         
         # 统一管理图片路径和映射
@@ -79,16 +80,15 @@ class StoryScene:
 
         # 3. 提示语
         if self.display_char_count >= len(current_full_text):
+            # 优先从多语言管理器获取，否则使用默认值
             hint_text = "按下 空格键 继续..."
+            if self.language_manager:
+                hint_text = self.language_manager.get_text("prompt", "continue")
+                
             hw = UIConfig.SMALL_FONT.size(hint_text)[0]
             self.ui_manager.add_component(Label(self.screen.get_width() - hw - 40, self.screen.get_height() - 40, hint_text, "small", (150, 150, 150)))
 
         self.ui_manager.draw()
-
-        # 3. 提示语
-        if self.display_char_count >= len(current_full_text):
-            hint = UIConfig.render_text("按下 空格键 继续...", type="small", color=(150, 150, 150))
-            self.screen.blit(hint, (self.screen.get_width() - 220, self.screen.get_height() - 40))
 
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:

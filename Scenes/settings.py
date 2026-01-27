@@ -321,7 +321,7 @@ class SettingsScene:
             UIConfig.COLOR_BTN_BASE, 
             UIConfig.COLOR_BORDER_HIGHLIGHT if is_selected else UIConfig.COLOR_BAR_BORDER,
             UIConfig.COLOR_YELLOW,
-            UIConfig.COLOR_SETTINGS_ACTIVE
+            UIConfig.COLOR_SETTINGS_TEXT
         )).selected = is_selected
 
     def get_current_resolution(self):
