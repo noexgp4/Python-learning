@@ -320,7 +320,7 @@ class SettingsScene:
             x, y_pos, width, 50, text, UIConfig.NORMAL_FONT,
             UIConfig.COLOR_BTN_BASE, 
             UIConfig.COLOR_BORDER_HIGHLIGHT if is_selected else UIConfig.COLOR_BAR_BORDER,
-            UIConfig.COLOR_HIGHLIGHT_BG,
+            UIConfig.COLOR_YELLOW,
             UIConfig.COLOR_SETTINGS_ACTIVE
         )).selected = is_selected
 

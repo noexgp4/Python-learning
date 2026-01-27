@@ -1,6 +1,7 @@
 class GameState:
-    def __init__(self):
+    def __init__(self, job_name="勇者"):
         # 基础玩家属性
+        self.job_name = job_name
         self.player_hp = 100
         self.max_hp = 100
         self.level = 1
@@ -21,6 +22,7 @@ class GameState:
     def to_dict(self):
         """序列化为字典"""
         return {
+            "job_name": self.job_name,
             "player_hp": self.player_hp,
             "max_hp": self.max_hp,
             "level": self.level,
@@ -35,6 +37,7 @@ class GameState:
     
     def load_from_dict(self, data):
         """从字典加载数据"""
+        self.job_name = data.get("job_name", "勇者")
         self.player_hp = data.get("player_hp", 100)
         self.max_hp = data.get("max_hp", 100)
         self.level = data.get("level", 1)

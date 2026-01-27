@@ -67,9 +67,9 @@ class ProgressBar:
         # 绘制边框
         pygame.draw.rect(screen, border_color, (self.x, self.y, self.width, self.height), 3)
         
-        # 填充进度
+        # 填充进度 (使用亮黄色/金黄色)
         fill_width = int(self.width * self.progress)
-        pygame.draw.rect(screen, UIConfig.COLOR_HIGHLIGHT_BG, (self.x, self.y, fill_width, self.height))
+        pygame.draw.rect(screen, UIConfig.COLOR_YELLOW, (self.x, self.y, fill_width, self.height))
 
 class SelectBox:
     def __init__(self, x, y, width, height, text, is_selected=False, icon=None):
@@ -88,7 +88,7 @@ class SelectBox:
         # 绘制背景
         pygame.draw.rect(screen, border_color, (self.x, self.y, self.width, self.height), 3)
         if self.selected:
-            pygame.draw.rect(screen, UIConfig.COLOR_HIGHLIGHT_BG, (self.x, self.y, self.width, self.height))
+            pygame.draw.rect(screen, UIConfig.COLOR_YELLOW, (self.x, self.y, self.width, self.height))
         
         # 绘制文字
         text_color = UIConfig.COLOR_SETTINGS_ACTIVE if self.selected else UIConfig.COLOR_SETTINGS_TEXT
@@ -98,6 +98,44 @@ class SelectBox:
         # 绘制箭头 (使用传入的图标)
         arrow_surf = UIConfig.render_text(self.icon, "small", UIConfig.COLOR_GRAY)
         screen.blit(arrow_surf, (self.x + self.width + 20, self.y + self.height//2 - arrow_surf.get_height()//2))
+
+class Panel:
+    """圆角背景面板组件"""
+    def __init__(self, x, y, width, height, color=(20, 20, 20, 180), border_color=None, border_width=2, border_radius=15):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.border_color = border_color
+        self.border_width = border_width
+        self.border_radius = border_radius
+
+    def draw(self, screen):
+        # 使用 Surface 以支持透明度
+        panel_surf = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        pygame.draw.rect(panel_surf, self.color, (0, 0, self.width, self.height), border_radius=self.border_radius)
+        if self.border_color:
+            pygame.draw.rect(panel_surf, self.border_color, (0, 0, self.width, self.height), self.border_width, border_radius=self.border_radius)
+        screen.blit(panel_surf, (self.x, self.y))
+
+class ImageComponent:
+    """图片显示组件"""
+    def __init__(self, x, y, image, border_color=None, border_width=2, border_radius=0):
+        self.x = x
+        self.y = y
+        self.image = image
+        self.border_color = border_color
+        self.border_width = border_width
+        self.border_radius = border_radius
+
+    def draw(self, screen):
+        # 绘制图片
+        screen.blit(self.image, (self.x, self.y))
+        # 绘制边框 (如果需要)
+        if self.border_color:
+            rect = self.image.get_rect(topleft=(self.x, self.y))
+            pygame.draw.rect(screen, self.border_color, rect, self.border_width, border_radius=self.border_radius)
 
 class UIConfig:
     # --- 1. 基础色板 (Base Palette) ---
@@ -118,12 +156,11 @@ class UIConfig:
     COLOR_YELLOW = COLOR_PALETTE_YELLOW
     COLOR_GRAY = COLOR_PALETTE_GRAY
     COLOR_BLUE = COLOR_PALETTE_BLUE
-    COLOR_BG = COLOR_PALETTE_BLUE
+    COLOR_BG = COLOR_PALETTE_SCREEN_BG
     
     # 交互状态
     COLOR_HIGHLIGHT = COLOR_PALETTE_YELLOW            # 文字高亮状态
-    COLOR_HIGHLIGHT_BG = COLOR_PALETTE_BLUE           # 容器填充高亮
-    COLOR_BORDER_HIGHLIGHT = COLOR_PALETTE_BLUE       # 边框选中高亮
+    COLOR_BORDER_HIGHLIGHT = COLOR_PALETTE_YELLOW     # 边框选中高亮 (金黄色)
     
     # --- 3. 界面模块专用名 (Per-Scene Styles) ---
     # 菜单界面
@@ -131,18 +168,20 @@ class UIConfig:
     COLOR_MENU_TEXT = COLOR_PALETTE_WHITE
     
     # 设置界面
-    COLOR_SETTINGS_TITLE = COLOR_PALETTE_BLUE
+    COLOR_SETTINGS_TITLE = COLOR_PALETTE_YELLOW
     COLOR_SETTINGS_TEXT = COLOR_PALETTE_GRAY
     COLOR_SETTINGS_ACTIVE = COLOR_PALETTE_WHITE
     COLOR_SETTINGS_TIPS = COLOR_PALETTE_GRAY_LIGHT
     
     # --- 4. 控件/组件专项 (Widget Styles) ---
-    COLOR_BAR_BG = COLOR_PALETTE_GRAY_DARK          # 进度条槽底色
+    COLOR_BAR_BG = (25, 25, 25)                     # 进度条槽底色 (更深)
     COLOR_BAR_BORDER = COLOR_PALETTE_GRAY           # 默认边框色
     COLOR_SCREEN_BG = COLOR_PALETTE_SCREEN_BG       # 屏幕全局背景色
-    COLOR_BTN_BASE = COLOR_PALETTE_GRAY_MID         # 按钮默认底色
+    COLOR_PANEL_BG = (30, 30, 30, 220)              # 通用面板底色
+    COLOR_BTN_BASE = (50, 50, 50)                   # 按钮默认底色
+    COLOR_GRAY_LIGHT = COLOR_PALETTE_GRAY_LIGHT     # 浅灰色
     
-    COLOR_DARK_BG = (30, 30, 30) # 仅供极少数底层特殊用途
+    COLOR_DARK_BG = (20, 20, 20)
 
 
     # --- 常用图标/符号 ---
