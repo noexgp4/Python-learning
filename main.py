@@ -11,6 +11,7 @@ from Core.game_config import ClassSelectScene
 from Scenes.story import StoryScene
 from Scenes.text import UIConfig, Panel, Label, ProgressBar
 from Scenes.UIManager import UIManager
+from Scenes.world_scene import WorldScene
 from Language.language_manager import LanguageManager
 
 # --- 初始化 Pygame ---
@@ -40,6 +41,7 @@ global_ui_manager = UIManager(screen)
 current_state = "MENU"
 current_game_state = None
 story_scene = None
+world_scene = None
 show_confirm_dialog = False
 confirm_selected_index = 0
 is_new_game = False
@@ -102,11 +104,11 @@ def main():
                 elif current_state == "STORY":
                     if story_scene:
                         result = story_scene.handle_input(event)
-                        if result == "BATTLE":
+                        if result == "WORLD":
                             if is_new_game:
                                 current_state = "CLASS_SELECT"
                             else:
-                                start_loading("BATTLE")
+                                start_loading("WORLD")
 
                 # --- 职业选择 ---
                 elif current_state == "CLASS_SELECT":
@@ -117,9 +119,8 @@ def main():
                     elif event.key == pygame.K_RETURN:
                         selected_class = class_select_scene.class_names[class_select_scene.selected_index]
                         current_game_state = GameState(job_name=selected_class)
-                        save_scene.refresh_slots()
-                        # 选完职业后进入加载页，再到存档页
-                        start_loading("SAVE_SELECT")
+                        # 选完职业后直接进入地图加载页
+                        start_loading("WORLD")
                     elif event.key == pygame.K_ESCAPE:
                         current_state = "MENU"
 
@@ -133,7 +134,7 @@ def main():
                                 save_scene.save_game(current_game_state, save_scene.get_selected_slot())
                                 save_scene.refresh_slots()
                                 show_confirm_dialog = False
-                                start_loading("BATTLE")
+                                start_loading("WORLD")
                             else:
                                 show_confirm_dialog = False
                         elif event.key == pygame.K_ESCAPE:
@@ -161,7 +162,7 @@ def main():
                                 if save_scene.slot_data[selected_index] is None:
                                     save_scene.save_game(current_game_state, save_scene.slots[selected_index])
                                     save_scene.refresh_slots()
-                                    start_loading("BATTLE")
+                                    start_loading("WORLD")
                                 else:
                                     show_confirm_dialog = True
                                     confirm_selected_index = 1
@@ -187,12 +188,22 @@ def main():
                         settings_scene.cancel_settings()
                         current_state = "MENU"
 
+                # --- 世界地图 ---
+                elif current_state == "WORLD":
+                    if world_scene:
+                        res = world_scene.handle_input(event)
+                        if res == "MENU":
+                            current_state = "MENU"
+
         # 2. 状态逻辑更新 (主要是 LOADING)
         if current_state == "LOADING":
             loading_progress += 0.02
             if loading_progress >= 1.0:
                 loading_progress = 1.0
                 current_state = loading_target_state
+                # 当进入 WORLD 状态时初始化场景
+                if current_state == "WORLD":
+                    world_scene = WorldScene(screen)
 
         # 3. 渲染
         if current_state == "MENU":
@@ -242,10 +253,14 @@ def main():
             
         elif current_state == "SETTINGS":
             settings_scene.draw()
-        elif current_state == "BATTLE":
-            screen.fill((50, 50, 100))
-            title = UIConfig.render_text("踏入战场...", type="title")
-            UIConfig.draw_center_text(screen, title, 250)
+        elif current_state == "WORLD":
+            if world_scene:
+                world_scene.draw()
+            else:
+                # 备用显示
+                screen.fill((50, 50, 100))
+                title = UIConfig.render_text("正在进入世界...", type="title")
+                UIConfig.draw_center_text(screen, title, 250)
 
         pygame.display.flip()
         clock.tick(60)

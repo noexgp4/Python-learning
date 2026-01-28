@@ -101,7 +101,7 @@ class StoryScene:
                 self.current_line += 1
                 self.display_char_count = 0
                 if self.current_line >= len(self.full_text):
-                    return "BATTLE"
+                    return "WORLD"
         return None
 
     def _wrap_text(self, text, font, max_width):
