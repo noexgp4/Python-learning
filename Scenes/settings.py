@@ -74,16 +74,16 @@ class SettingsScene:
                     self.current_language = data.get("language", "zh")
                     self.language_manager.change_language(self.current_language)
                     
-                    print(f"✓ 从 {self.config_file} 加载配置成功")
+                    print(f"[OK] 从 {self.config_file} 加载配置成功")
                     print(f"  背景音乐音量: {int(self.bgm_volume*100)}%")
                     print(f"  音效音量: {int(self.sfx_volume*100)}%")
                     print(f"  分辨率: {self.RESOLUTIONS[self.resolution_index]}")
                     print(f"  全屏模式: {'是' if self.is_fullscreen else '否'}")
             except Exception as e:
-                print(f"✗ 加载配置失败: {e}，使用默认值")
+                print(f"[ERROR] 加载配置失败: {e}，使用默认值")
                 self._set_defaults()
         else:
-            print(f"✗ 配置文件不存在，将在 {self.config_file} 创建")
+            print(f"[INFO] 配置文件不存在，将在 {self.config_file} 创建")
             self._set_defaults()
         
         # 进入设置界面时，从当前值初始化临时值
@@ -124,12 +124,12 @@ class SettingsScene:
             
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
-            print(f"✓ 配置已保存到 {self.config_file}")
+            print(f"[OK] 配置已保存到 {self.config_file}")
             print(f"  背景音乐: {int(self.bgm_volume*100)}%, 音效: {int(self.sfx_volume*100)}%")
             print(f"  分辨率: {self.RESOLUTIONS[self.resolution_index]}, 全屏: {self.is_fullscreen}")
             return True
         except Exception as e:
-            print(f"✗ 保存失败: {e}")
+            print(f"[ERROR] 保存失败: {e}")
             print(f"  尝试保存位置: {self.config_file}")
             return False
     

@@ -5,9 +5,7 @@ MONSTERS_DATA = {
         "exp": 20, "gold": 10,
         "image_key": "slime_g", # 对应加载哪张立绘
         "ai_type": "AGGRESSIVE", # 攻击型 AI
-        "skills": [
-            {"name": "撞击", "type": "PHYSIC", "power": 10}
-        ]
+        "skills": ["tackle"]
     },
     "Skeleton_Mage": {
         "name": "骷髅法师",
@@ -15,8 +13,6 @@ MONSTERS_DATA = {
         "exp": 150, "gold": 80,
         "image_key": "sk_mage",
         "ai_type": "CAUTIOUS", # 血少会加血的 AI
-        "skills": [
-            {"name": "暗影箭", "type": "MAGIC", "power": 25, "cost": 15}
-        ]
+        "skills": ["shadow_bolt"]
     }
 }

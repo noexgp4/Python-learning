@@ -1,0 +1,74 @@
+{
+    "powerful_strike": {
+        "name": "奋力一击",
+        "cost": 10,
+        "type": "PHYSIC",
+        "power": 25
+    },
+    "study_notes": {
+        "name": "读书笔记",
+        "cost": 20,
+        "type": "MAGIC",
+        "power": 15
+    },
+    "lunch_charge": {
+        "name": "午休充电",
+        "cost": 30,
+        "type": "MAGIC",
+        "power": 50
+    },
+    "report_attack": {
+        "name": "报表攻击",
+        "cost": 15,
+        "type": "MAGIC",
+        "power": 30
+    },
+    "write_bug": {
+        "name": "编写Bug",
+        "cost": 25,
+        "type": "MAGIC",
+        "power": 45
+    },
+    "fix_bug": {
+        "name": "修复Bug",
+        "cost": 15,
+        "type": "MAGIC",
+        "power": 35
+    },
+    "fireball": {
+        "name": "火球术",
+        "cost": 20,
+        "type": "FIRE",
+        "power": 40
+    },
+    "arcane_blast": {
+        "name": "奥术冲击",
+        "cost": 40,
+        "type": "MAGIC",
+        "power": 70
+    },
+    "heavy_slash": {
+        "name": "重劈",
+        "cost": 0,
+        "type": "PHYSIC",
+        "power": 30
+    },
+    "whirlwind": {
+        "name": "旋风斩",
+        "cost": 15,
+        "type": "PHYSIC",
+        "power": 50
+    },
+    "tackle": {
+        "name": "撞击",
+        "cost": 0,
+        "type": "PHYSIC",
+        "power": 10
+    },
+    "shadow_bolt": {
+        "name": "暗影箭",
+        "cost": 15,
+        "type": "MAGIC",
+        "power": 25
+    }
+}

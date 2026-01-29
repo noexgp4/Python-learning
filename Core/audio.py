@@ -37,11 +37,11 @@ class AudioManager:
                 pygame.mixer.music.load(self.bgm_path)
                 pygame.mixer.music.play(-1) # 循环播放
                 pygame.mixer.music.set_volume(self.bgm_volume)
-                print(f"✓ 背景音乐加载成功")
+                print(f"[OK] 背景音乐加载成功")
             else:
-                print(f"✗ 背景音乐文件不存在")
+                print(f"[ERROR] 背景音乐文件不存在")
         except Exception as e:
-            print(f"✗ 背景音乐加载失败: {e}")
+            print(f"[ERROR] 背景音乐加载失败: {e}")
 
         # 加载按钮音效
         try:
@@ -50,11 +50,11 @@ class AudioManager:
             if os.path.exists(self.sfx_path):
                 self.sounds["button"] = pygame.mixer.Sound(self.sfx_path)
                 self.sounds["button"].set_volume(self.sfx_volume)
-                print(f"✓ 按钮音效加载成功")
+                print(f"[OK] 按钮音效加载成功")
             else:
-                print(f"✗ 按钮音效文件不存在")
+                print(f"[ERROR] 按钮音效文件不存在")
         except Exception as e:
-            print(f"✗ 按钮音效加载失败: {e}")
+            print(f"[ERROR] 按钮音效加载失败: {e}")
             self.sounds["button"] = None
 
     def set_bgm_volume(self, volume):
