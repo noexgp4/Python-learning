@@ -175,15 +175,14 @@
 </data>
  </layer>
  <objectgroup id="2" name="物件層 1">
-  <object id="5" gid="17" x="241" y="264" width="46" height="95" rotation="-180"/>
   <object id="10" gid="16" x="210.667" y="363.333" width="16" height="8"/>
-  <object id="14" gid="6" x="288.833" y="318.25" width="53.6667" height="30.6667"/>
+  <object id="14" gid="6" x="193.333" y="378.083" width="186.167" height="106"/>
   <object id="20" gid="1" x="241" y="285.5" width="46" height="48"/>
   <object id="22" gid="1" x="287.5" y="285" width="46" height="48"/>
   <object id="23" gid="1" x="333" y="285.5" width="46" height="48"/>
   <object id="24" gid="1" x="379" y="286" width="46" height="48"/>
   <object id="25" gid="1" x="379.5" y="333.5" width="46" height="48"/>
   <object id="26" gid="1" x="380" y="381" width="46" height="48"/>
-  <object id="27" gid="2" x="333.5" y="381.5" width="48" height="48"/>
+  <object id="27" gid="2" x="193" y="285" width="48" height="48"/>
  </objectgroup>
 </map>
