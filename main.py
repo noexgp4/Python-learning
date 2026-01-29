@@ -12,6 +12,8 @@ from Scenes.story import StoryScene
 from Scenes.text import UIConfig, Panel, Label, ProgressBar
 from Scenes.UIManager import UIManager
 from Scenes.world_scene import WorldScene
+from Scenes.BattleScene import BattleScene
+from Scenes.models.entity import Entity
 from Language.language_manager import LanguageManager
 
 # --- 初始化 Pygame ---
@@ -27,6 +29,7 @@ settings_scene = SettingsScene(temp_screen, audio_manager, language_manager)
 screen = settings_scene.apply_resolution_change()
 settings_scene.screen = screen
 pygame.display.set_caption("像素勇者")
+pygame.key.stop_text_input() # 关键：禁用 IME 文本输入，防止按键拦截
 
 clock = pygame.time.Clock()
 
@@ -42,9 +45,11 @@ current_state = "MENU"
 current_game_state = None
 story_scene = None
 world_scene = None
+battle_scene = None
 show_confirm_dialog = False
 confirm_selected_index = 0
 is_new_game = False
+current_slot_id = None  # 记录当前正在使用的存档槽位
 
 # --- 加载页专用变量 ---
 loading_progress = 0
@@ -67,7 +72,7 @@ def start_loading(target_state):
     current_state = "LOADING"
 
 def main():
-    global current_state, show_confirm_dialog, story_scene, current_game_state, screen, confirm_selected_index, is_new_game, loading_progress
+    global current_state, show_confirm_dialog, story_scene, current_game_state, screen, confirm_selected_index, is_new_game, loading_progress, current_slot_id, world_scene, battle_scene
     
     while True:
         # 1. 事件处理
@@ -91,6 +96,7 @@ def main():
                             current_state = "STORY"
                         elif menu_scene.selected_index == 1: # 加载存档
                             is_new_game = False
+                            current_game_state = None  # 重置状态，确保存档界面进入“加载”模式
                             save_scene.refresh_slots()
                             current_state = "SAVE_SELECT"
                         elif menu_scene.selected_index == 2: # 游戏设置
@@ -131,7 +137,10 @@ def main():
                             confirm_selected_index = 1 - confirm_selected_index
                         elif event.key == pygame.K_RETURN:
                             if confirm_selected_index == 0: # 确认覆盖
-                                save_scene.save_game(current_game_state, save_scene.get_selected_slot())
+                                current_slot_id = save_scene.get_selected_slot()
+                                # 保存前更新当前场景状态
+                                current_game_state.current_scene = "WORLD"
+                                save_scene.save_game(current_game_state, current_slot_id)
                                 save_scene.refresh_slots()
                                 show_confirm_dialog = False
                                 start_loading("WORLD")
@@ -151,16 +160,21 @@ def main():
                         elif event.key == pygame.K_RETURN:
                             selected_index = save_scene.selected_index
                             if current_game_state is None:
-                                # 读档流程
-                                if save_scene.slot_data[selected_index] is not None:
-                                    current_game_state = save_scene.load_game(save_scene.slots[selected_index])
+                                    current_slot_id = save_scene.slots[selected_index]
+                                    current_game_state = save_scene.load_game(current_slot_id)
                                     if current_game_state:
-                                        story_scene = StoryScene(screen, current_game_state.job_name)
-                                        start_loading("STORY")
+                                        # 智能跳转：如果存档记录在 WORLD，则直接进入地图
+                                        target = current_game_state.current_scene
+                                        if target == "WORLD":
+                                            start_loading("WORLD")
+                                        else:
+                                            story_scene = StoryScene(screen, current_game_state.job_name)
+                                            start_loading("STORY")
                             else:
                                 # 新建建档逻辑
                                 if save_scene.slot_data[selected_index] is None:
-                                    save_scene.save_game(current_game_state, save_scene.slots[selected_index])
+                                    current_slot_id = save_scene.slots[selected_index]
+                                    save_scene.save_game(current_game_state, current_slot_id)
                                     save_scene.refresh_slots()
                                     start_loading("WORLD")
                                 else:
@@ -194,6 +208,37 @@ def main():
                         res = world_scene.handle_input(event)
                         if res == "MENU":
                             current_state = "MENU"
+                        elif res == "BATTLE":
+                            # 1. 根据存档中的职业名称初始化玩家实体
+                            job_key = current_game_state.job_name if current_game_state else "学生"
+                            player_ent = Entity.from_job(job_key)
+                            
+                            # 2. 从存档同步实时属性
+                            if player_ent and current_game_state:
+                                player_ent.hp = current_game_state.player_hp
+                                player_ent.mp = current_game_state.player_mp
+                            
+                            # 3. 初始化怪物实体
+                            enemy_ent = Entity.from_monster("Slime_Green")
+                            
+                            battle_scene = BattleScene(screen, player_ent, enemy_ent)
+                            current_state = "BATTLE"
+                        elif res == "SAVE":
+                            # 进入存档选择界面进行保存
+                            save_scene.refresh_slots()
+                            current_state = "SAVE_SELECT"
+
+                # --- 战斗界面 ---
+                elif current_state == "BATTLE":
+                    if battle_scene:
+                        res = battle_scene.handle_input(event)
+                        if res == "WORLD":
+                            current_state = "WORLD"
+                            # 1. 同步战斗后的属性到存档对象
+                            if current_game_state:
+                                current_game_state.player_hp = battle_scene.system.player.hp
+                                current_game_state.player_mp = battle_scene.system.player.mp
+                                # 取消自动存档，仅同步数值
 
         # 2. 状态逻辑更新 (主要是 LOADING)
         if current_state == "LOADING":
@@ -204,6 +249,9 @@ def main():
                 # 当进入 WORLD 状态时初始化场景
                 if current_state == "WORLD":
                     world_scene = WorldScene(screen)
+                elif current_state == "BATTLE":
+                    # 可以在这里初始化，但我们目前在事件中手动初始化了
+                    pass
 
         # 3. 渲染
         if current_state == "MENU":
@@ -255,12 +303,18 @@ def main():
             settings_scene.draw()
         elif current_state == "WORLD":
             if world_scene:
+                world_scene.update()
                 world_scene.draw()
             else:
                 # 备用显示
                 screen.fill((50, 50, 100))
                 title = UIConfig.render_text("正在进入世界...", type="title")
                 UIConfig.draw_center_text(screen, title, 250)
+        
+        elif current_state == "BATTLE":
+            if battle_scene:
+                battle_scene.update()
+                battle_scene.draw()
 
         pygame.display.flip()
         clock.tick(60)

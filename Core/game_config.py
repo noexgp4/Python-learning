@@ -1,13 +1,10 @@
 import pygame
 from Scenes.text import UIConfig, Label, Panel, ImageComponent
 from Scenes.UIManager import UIManager
+from Scenes.data.jobs_config import JOBS_DATA
 
-# 职业初始属性配置
-CLASSES = {
-    "学生": {"hp": 120, "atk": 10, "desc": "高生命值，擅长近战", "color": (200, 50, 50), "sprite_index": 0},
-    "上班族": {"hp": 80, "atk": 20, "desc": "脆皮但魔法伤害极高", "color": (50, 100, 255), "sprite_index": 1},
-    "程序员": {"hp": 90, "atk": 15, "desc": "高暴击，身手敏捷", "color": (50, 200, 50), "sprite_index": 0}
-}
+# 为了兼容旧代码，将 JOBS_DATA 映射到 CLASSES
+CLASSES = JOBS_DATA
 
 class ClassSelectScene:
     def __init__(self, screen):
@@ -47,15 +44,17 @@ class ClassSelectScene:
         # 2. 左侧：职业列表与属性
         for i, name in enumerate(self.class_names):
             is_selected = (i == self.selected_index)
-            color = CLASSES[name]["color"] if is_selected else (150, 150, 150)
+            # 注意：JOBS_DATA 中使用的是 theme_color，而不是之前的 color
+            color = CLASSES[name].get("theme_color", (150, 150, 150)) if is_selected else (150, 150, 150)
             display_text = f"▶ {name}" if is_selected else f"  {name}"
             self.ui_manager.add_component(Label(LEFT_COLUMN_X, 200 + i * 60, display_text, "normal", color))
 
             if is_selected:
                 info = CLASSES[name]
-                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 420, info["desc"], "small", (200, 200, 200)))
-                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 455, f"生命值: {info['hp']}", "small", (255, 100, 100)))
-                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 490, f"攻击力: {info['atk']}", "small", (100, 255, 100)))
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 520, info["desc"], "small", (200, 200, 200)))
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 555, f"生命值: {info['hp']}", "small", (255, 100, 100)))
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 590, f"消耗值: {info['mp']}", "small", (100, 200, 255)))
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 625, f"攻击力: {info['atk']}/{info['m_atk']}", "small", (100, 255, 100)))
 
         # 3. 右侧：职业配图
         selected_class = self.class_names[self.selected_index]

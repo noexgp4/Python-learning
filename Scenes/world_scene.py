@@ -10,10 +10,15 @@ class WorldScene:
         self.camera_offset = pygame.Vector2(0, 0)
 
     def handle_input(self, event):
-        # 暂时只处理简单的退出回菜单，或者预留给玩家移动
+        # 处理退出回菜单
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "MENU"
+            # 增加空格键作为触发，因为空格键受输入法干扰最小
+            if event.key == pygame.K_b or event.key == pygame.K_SPACE:
+                return "BATTLE"
+            if event.key == pygame.K_p:
+                return "SAVE"
         return None
 
     def update(self):
