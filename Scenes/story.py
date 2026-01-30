@@ -12,8 +12,10 @@ class StoryScene:
         self.language_manager = getattr(pygame, 'language_manager', None) # 尝试获取全局语言管理器
         self.ui_manager = UIManager(self.screen)
         
-        # 统一管理图片路径和映射
-        self.illustrations = self._load_assets("Assets/Image/Illustrations", ["elder.png", "intro_boss.png"])
+        # 统一管理图片路径和映射（使用模块相对路径）
+        base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+        illustrations_path = os.path.join(base_dir, "Assets", "Image", "Illustrations")
+        self.illustrations = self._load_assets(illustrations_path, ["elder.png", "intro_boss.png"])
         self.line_to_image = {0: "intro_boss.png", 1: "elder.png"}
             
         self.current_line = 0

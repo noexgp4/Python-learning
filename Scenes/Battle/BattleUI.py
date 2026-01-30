@@ -22,9 +22,10 @@ class BattleUI:
         # 边框
         pygame.draw.rect(self.screen, (180, 160, 50), (x, y, width, height), 2)
         
-        # 数值标签在上方或旁边
-        val_text = f"{label}: {int(current)} / {int(maximum)}"
-        self.draw_text(val_text, (x, y - 22), color, "small")
+        # 数值标签在下方（如果有标签）
+        if label:
+            val_text = f"{label}: {int(current)} / {int(maximum)}"
+            self.draw_text(val_text, (x, y + height + 2), color, "small")
 
     def trigger_damage_num(self, value, pos):
         self.damage_numbers.append({
@@ -44,13 +45,13 @@ class BattleUI:
         # 绘制长的 HP 条
         self.draw_bar(base_x, base_y, player.hp, player.max_hp, (50, 200, 50), width=600, label="HP")
         # 绘制长的 MP 条 (紧跟下方)
-        self.draw_bar(base_x, base_y + 40, player.mp, player.max_mp, player.theme_color, width=600, label="MP")
+        self.draw_bar(base_x, base_y + 50, player.mp, player.max_mp, player.theme_color, width=600, label="MP")
 
     def draw_enemy_status(self, enemy):
         sw = self.screen.get_width()
         base_x, base_y = sw - 350, 100
         self.draw_text(enemy.name, (base_x, base_y), (255, 100, 100))
-        self.draw_bar(base_x, base_y + 40, enemy.hp, enemy.max_hp, (200, 50, 50), width=250, label="")
+        self.draw_bar(base_x, base_y + 30, enemy.hp, enemy.max_hp, (200, 50, 50), width=250, label="")
 
     def draw_menu_grid(self, options, selected_idx, player_color):
         sw, sh = self.screen.get_width(), self.screen.get_height()

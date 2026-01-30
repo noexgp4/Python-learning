@@ -69,7 +69,7 @@
 
 ```python
 # 1. 直接查询技能
-from Scenes.data.skills_library import SkillsLibrary
+from Scenes.Battle.data.skills_library import SkillsLibrary
 
 fireball = SkillsLibrary.get_skill("fireball")
 # {'name': '火球术', 'cost': 20, 'type': 'FIRE', 'power': 40}
@@ -78,7 +78,7 @@ fireball = SkillsLibrary.get_skill("fireball")
 mage_skills = SkillsLibrary.get_skills_by_ids(["fireball", "arcane_blast"])
 
 # 3. 创建实体(自动加载技能)
-from Scenes.models.entity import Entity
+from Scenes.Battle.models.entity import Entity
 
 mage = Entity.from_job("Mage")
 print(mage.skills)  # 自动从技能库加载完整技能数据
