@@ -22,7 +22,10 @@ class MainMenu:
         # 1. 加载并处理背景图
         try:
             # 加载图片（建议使用 1920x1080 或其他 16:9 比例的高分辨率图）
-            original_bg = pygame.image.load("Assets/Image/Mainmenu_background.png").convert()
+            import os
+            base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+            bg_path = os.path.join(base_dir, "Assets", "Image", "Mainmenu_background.png")
+            original_bg = pygame.image.load(bg_path).convert()
             self.original_bg = original_bg  # 保存原始图片以供缩放
         except:
             # 如果没找到图片，创建一个深蓝色的表面作为备用

@@ -1,11 +1,14 @@
+import os
 import pygame
 from Assets.Map.map import TiledMap
 
 class WorldScene:
     def __init__(self, screen):
         self.screen = screen
-        # 加载测试地图
-        self.tiled_map = TiledMap("Assets/Map/testmap.tmx")
+        # 加载测试地图（使用模块相对路径以避免工作目录依赖）
+        base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+        map_path = os.path.join(base_dir, "Assets", "Map", "testmap.tmx")
+        self.tiled_map = TiledMap(map_path)
         self.map_surface = self.tiled_map.make_map()
         self.camera_offset = pygame.Vector2(0, 0)
 

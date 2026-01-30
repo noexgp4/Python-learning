@@ -216,7 +216,9 @@ class UIConfig:
     ICON_SELECT = "< >"
 
     # --- 字体文件路径 ---
-    FONT_PATH = r"Language\Font\fusion-pixel-10px-monospaced-zh_hans.ttf"
+    import os
+    _base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+    FONT_PATH = os.path.join(_base_dir, "Language", "Font", "fusion-pixel-10px-monospaced-zh_hans.ttf")
 
     # --- 预设字体模板 ---
     # 我们直接在这里生成字体对象

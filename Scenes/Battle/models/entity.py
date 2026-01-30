@@ -1,6 +1,6 @@
-from Scenes.data.jobs_config import JOBS_DATA
-from Scenes.data.monsters_config import MONSTERS_DATA
-from Scenes.data.skills_library import SkillsLibrary
+from ..data.jobs_config import JOBS as JOBS_DATA
+from ..data.monsters_config import MONSTERS_DATA
+from ..data.skills_library import SkillsLibrary
 
 class Entity:
     def __init__(self, data_dict):

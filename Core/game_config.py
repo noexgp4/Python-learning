@@ -1,7 +1,7 @@
 import pygame
 from Scenes.text import UIConfig, Label, Panel, ImageComponent
 from Scenes.UIManager import UIManager
-from Scenes.data.jobs_config import JOBS_DATA
+from Scenes.Battle.data.jobs_config import JOBS as JOBS_DATA
 
 # 为了兼容旧代码，将 JOBS_DATA 映射到 CLASSES
 CLASSES = JOBS_DATA
@@ -17,7 +17,9 @@ class ClassSelectScene:
         self.sprites = []
         try:
             # 优先尝试加载我们提取的 PNG，如果失败则静默处理
-            sprite_path = "Assets/Image/character_sprites.png"
+            import os
+            base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+            sprite_path = os.path.join(base_dir, "Assets", "Image", "character_sprites.png")
             sheet = pygame.image.load(sprite_path).convert_alpha()
             for i in range(2):
                 rect = pygame.Rect(i * 32, 0, 32, 32)
