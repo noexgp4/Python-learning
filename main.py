@@ -12,8 +12,8 @@ from Scenes.story import StoryScene
 from Scenes.text import UIConfig, Panel, Label, ProgressBar
 from Scenes.UIManager import UIManager
 from Scenes.world_scene import WorldScene
-from Scenes.BattleScene import BattleScene
-from Scenes.models.entity import Entity
+from Scenes.Battle.BattleScene import BattleScene
+from Scenes.Battle.models.entity import Entity
 from Language.language_manager import LanguageManager
 
 # --- 初始化 Pygame ---

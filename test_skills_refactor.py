@@ -3,8 +3,8 @@ import sys
 import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-from Scenes.models.entity import Entity
-from Scenes.data.skills_library import SkillsLibrary
+from Scenes.Battle.models.entity import Entity
+from Scenes.Battle.data.skills_library import SkillsLibrary
 
 print("=" * 50)
 print("技能系统重构测试")

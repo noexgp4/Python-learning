@@ -1,8 +1,8 @@
 import pygame
-from Scenes.logic.BattleSystem import BattleSystem
-from Scenes.BattleUi.BattleUI import BattleUI
+from Scenes.Battle.BattleSystem import BattleSystem
+from Scenes.Battle.BattleUI import BattleUI
 from Scenes.text import UIConfig
-from Scenes.models.entity import Entity
+from .models.entity import Entity
 
 class BattleScene:
     def __init__(self, screen, player_entity, enemy_entity):
