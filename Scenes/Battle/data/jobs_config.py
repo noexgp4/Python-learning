@@ -12,6 +12,7 @@ _WARRIOR = {
     "spd": 8,
     "skills": ["basic_slash", "heavy_strike"],
     "sprite_index": 0,
+    "world_speed": 100,
     "theme_color": (200, 120, 100)
 }
 
@@ -26,6 +27,7 @@ _MAGE = {
     "spd": 10,
     "skills": ["fire_ball", "ice_shards"],
     "sprite_index": 1,
+    "world_speed": 100,
     "theme_color": (100, 140, 220)
 }
 

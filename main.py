@@ -75,6 +75,7 @@ def main():
     global current_state, show_confirm_dialog, story_scene, current_game_state, screen, confirm_selected_index, is_new_game, loading_progress, current_slot_id, world_scene, battle_scene
     
     while True:
+        dt = clock.tick(60) / 1000.0
         # 1. 事件处理
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -205,6 +206,8 @@ def main():
                 # --- 世界地图 ---
                 elif current_state == "WORLD":
                     if world_scene:
+                        world_scene.update(dt)
+                        world_scene.draw()
                         res = world_scene.handle_input(event)
                         if res == "MENU":
                             current_state = "MENU"
@@ -239,7 +242,7 @@ def main():
                                 current_game_state.player_hp = battle_scene.system.player.hp
                                 current_game_state.player_mp = battle_scene.system.player.mp
                                 # 取消自动存档，仅同步数值
-
+        
         # 2. 状态逻辑更新 (主要是 LOADING)
         if current_state == "LOADING":
             loading_progress += 0.02
@@ -248,7 +251,8 @@ def main():
                 current_state = loading_target_state
                 # 当进入 WORLD 状态时初始化场景
                 if current_state == "WORLD":
-                    world_scene = WorldScene(screen)
+                    job_name = current_game_state.job_name if current_game_state else "学生"
+                    world_scene = WorldScene(screen, job_name)
                 elif current_state == "BATTLE":
                     # 可以在这里初始化，但我们目前在事件中手动初始化了
                     pass
@@ -303,7 +307,7 @@ def main():
             settings_scene.draw()
         elif current_state == "WORLD":
             if world_scene:
-                world_scene.update()
+                world_scene.update(dt)
                 world_scene.draw()
             else:
                 # 备用显示
