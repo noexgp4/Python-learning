@@ -1,7 +1,7 @@
 import os
 import pygame
 from Assets.Map.map import TiledMap
-from Core.camera import Camera
+from Assets.Map.camera import Camera
 
 class WorldScene:
     def __init__(self, screen):
@@ -14,12 +14,13 @@ class WorldScene:
         self.tiled_map = TiledMap(map_path)
         self.map_surface = self.tiled_map.make_map()
         
-        # 初始化相机系统
+        # 初始化相机系统（zoom=2.0 表示放大2倍）
         self.camera = Camera(
             screen_width, 
             screen_height,
             self.tiled_map.width,
-            self.tiled_map.height
+            self.tiled_map.height,
+            zoom=2.0  # 初始缩放为2倍放大
         )
         
         # 玩家位置（从地图的出生点初始化）
@@ -31,6 +32,7 @@ class WorldScene:
         
         self.player_width = 32
         self.player_height = 32
+        self.player_speed = 4  # 玩家移动速度
 
     def handle_input(self, event):
         # 处理退出回菜单
@@ -42,6 +44,25 @@ class WorldScene:
                 return "BATTLE"
             if event.key == pygame.K_p:
                 return "SAVE"
+            # 缩放控制（Z/X键）
+            if event.key == pygame.K_z:
+                # Z键放大
+                self.camera.set_zoom(self.camera.zoom + 0.5)
+            if event.key == pygame.K_x:
+                # X键缩小
+                self.camera.set_zoom(max(0.5, self.camera.zoom - 0.5))
+        
+        # 方向键控制玩家移动
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            self.player_y = max(0, self.player_y - self.player_speed)
+        if keys[pygame.K_DOWN]:
+            self.player_y = min(self.tiled_map.height - self.player_height, self.player_y + self.player_speed)
+        if keys[pygame.K_LEFT]:
+            self.player_x = max(0, self.player_x - self.player_speed)
+        if keys[pygame.K_RIGHT]:
+            self.player_x = min(self.tiled_map.width - self.player_width, self.player_x + self.player_speed)
+        
         return None
 
     def update(self):
