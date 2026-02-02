@@ -10,18 +10,19 @@ class WorldScene:
         self.screen = screen
         screen_width, screen_height = screen.get_size()
 
-        # 地图
+        # 1. 先计算路径
         base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
         map_path = os.path.join(base_dir, "Assets", "Map", "testmap.tmx")
 
+        # 2. 再加载地图（此时 map_path 已经有值了）
         self.tiled_map = TiledMap(map_path)
         self.map_surface = self.tiled_map.make_map()
 
-        # 玩家出生点
+        # 3. 再创建玩家
         spawn_point = self.tiled_map.get_player_spawn_point() or (0,0)
         self.player = Player(spawn_point[0], spawn_point[1], job_name)
 
-        # 相机
+        # 4. 最后初始化相机
         self.camera = Camera(
             screen_width,
             screen_height,
@@ -33,11 +34,13 @@ class WorldScene:
         # 玩家（速度来自职业表）
     def update(self, dt):
         keys = pygame.key.get_pressed()
-        dx, dy = self.player.update(dt, keys)
-
-        # 边界限制
-        self.player.x = max(0, min(self.tiled_map.width - self.player.width, self.player.x + dx))
-        self.player.y = max(0, min(self.tiled_map.height - self.player.height, self.player.y + dy))
+        self.player.update(
+            dt, 
+            keys, 
+            self.tiled_map.walls,  # <--- 关键点：数据在这里传递
+            self.tiled_map.width, 
+            self.tiled_map.height
+        )
 
         self.camera.update(self.player.x, self.player.y, self.player.width, self.player.height)
 

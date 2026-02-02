@@ -3,11 +3,17 @@ import pytmx
 
 class TiledMap:
     def __init__(self, filename):
+        
         # pixelalpha=True 确保支持透明度
         self.tmx_data = pytmx.load_pygame(filename, pixelalpha=True)
         self.width = self.tmx_data.width * self.tmx_data.tilewidth
         self.height = self.tmx_data.height * self.tmx_data.tileheight
 
+        self.walls = [] 
+        for obj in self.tmx_data.objects:
+            if obj.name == "Collision":
+                self.walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                
     def get_player_spawn_point(self):
         """获取PlayerSpawn图层中的玩家出生点坐标
         
@@ -60,3 +66,6 @@ class TiledMap:
         temp_surface.fill((100, 150, 80))  # 草地绿色
         self.render(temp_surface)
         return temp_surface
+    def get_walls(self):
+        """返回所有的碰撞矩形供 Player 使用"""
+        return self.walls

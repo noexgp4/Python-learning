@@ -2,7 +2,7 @@ from ..data.jobs_config import JOBS as JOBS_DATA
 from ..data.monsters_config import MONSTERS_DATA
 from ..data.skills_library import SkillsLibrary
 
-class Entity:
+class Entity:   
     def __init__(self, data_dict):
         # 通用属性
         self.name = data_dict.get("name", "Unknown")
