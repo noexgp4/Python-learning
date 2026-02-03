@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="27" nextobjectid="26">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="27" nextobjectid="27">
  <tileset firstgid="1" name="Building" tilewidth="176" tileheight="119" tilecount="67" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -10,6 +10,9 @@
   </tile>
   <tile id="2">
    <image source="../Tiles/building/b.png" width="52" height="100"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" name="Wall" x="0" y="0" width="52" height="100"/>
+   </objectgroup>
   </tile>
   <tile id="3">
    <image source="../Tiles/building/brick.png" width="16" height="19"/>
@@ -61,11 +64,17 @@
   </tile>
   <tile id="19">
    <image source="../Tiles/building/fountain (1).png" width="48" height="48"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" name="Wall" x="0" y="0" width="48" height="47"/>
+   </objectgroup>
   </tile>
   <tile id="20">
    <image source="../Tiles/building/fountain (2).png" width="48" height="47"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" name="Wall" x="0" y="0" width="48" height="47"/>
+   </objectgroup>
   </tile>
-  <tile id="21">
+  <tile id="21" type="Wall">
    <image source="../Tiles/building/fountain (3).png" width="48" height="47"/>
   </tile>
   <tile id="22">
@@ -175,6 +184,9 @@
   </tile>
   <tile id="56">
    <image source="../Tiles/building/house (40).png" width="64" height="100"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" name="Wall" x="0" y="0" width="47" height="100"/>
+   </objectgroup>
   </tile>
   <tile id="57">
    <image source="../Tiles/building/market.png" width="80" height="86"/>
@@ -199,12 +211,18 @@
   </tile>
   <tile id="64">
    <image source="../Tiles/building/statue.png" width="32" height="48"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" name="Wall" x="0" y="0" width="32" height="47"/>
+   </objectgroup>
   </tile>
   <tile id="65">
    <image source="../Tiles/building/window (1).png" width="16" height="16"/>
   </tile>
   <tile id="67">
    <image source="../Tiles/building/b.png" width="52" height="100"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" name="Wall" x="0" y="0" width="52" height="100"/>
+   </objectgroup>
   </tile>
   <wangsets>
    <wangset name="Unnamed Set" type="corner" tile="-1">
@@ -762,10 +780,10 @@
   <object id="16" x="116.583" y="138.833"/>
  </objectgroup>
  <objectgroup id="25" name="Collision">
-  <object id="19" x="48.5" y="42.3333" width="45.5" height="119.667"/>
-  <object id="20" x="146" y="61.5" width="125" height="67.5"/>
-  <object id="21" x="-17" y="438" width="978" height="199"/>
-  <object id="22" x="710" y="144" width="256" height="324"/>
+  <object id="20" x="143.636" y="64.0455" width="80.2727" height="63.8636"/>
+  <object id="21" x="0" y="438" width="961" height="199"/>
+  <object id="22" x="765" y="134" width="204" height="301"/>
   <object id="25" x="224.5" y="124" width="47" height="33.5"/>
+  <object id="26" x="95.3958" y="64.0947" width="48.2652" height="24.697"/>
  </objectgroup>
 </map>
