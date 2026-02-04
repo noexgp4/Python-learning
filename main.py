@@ -161,24 +161,33 @@ def main():
                         elif event.key == pygame.K_RETURN:
                             selected_index = save_scene.selected_index
                             if current_game_state is None:
-                                    current_slot_id = save_scene.slots[selected_index]
-                                    current_game_state = save_scene.load_game(current_slot_id)
-                                    if current_game_state:
-                                        # 智能跳转：如果存档记录在 WORLD，则直接进入地图
-                                        target = current_game_state.current_scene
-                                        if target == "WORLD":
-                                            start_loading("WORLD")
-                                        else:
-                                            story_scene = StoryScene(screen, current_game_state.job_name)
-                                            start_loading("STORY")
-                            else:
-                                # 新建建档逻辑
+                                # 【加载模式】需确保存档存在
                                 if save_scene.slot_data[selected_index] is None:
+                                    print("槽位为空，无法加载！请先通过'开始冒险'创建存档。")
+                                    continue
+                                    
+                                current_slot_id = save_scene.slots[selected_index]
+                                loaded_state = save_scene.load_game(current_slot_id)
+                                if loaded_state:
+                                    current_game_state = loaded_state
+                                    # 智能跳转：如果存档记录在 WORLD，则直接进入地图
+                                    target = current_game_state.current_scene
+                                    if target == "WORLD":
+                                        start_loading("WORLD")
+                                    else:
+                                        story_scene = StoryScene(screen, current_game_state.job_name)
+                                        start_loading("STORY")
+                            else:
+                                # 【新建/覆盖模式】(当前已有 current_game_state)
+                                if save_scene.slot_data[selected_index] is None:
+                                    # 空槽位直接保存
                                     current_slot_id = save_scene.slots[selected_index]
+                                    current_game_state.current_scene = "WORLD"
                                     save_scene.save_game(current_game_state, current_slot_id)
                                     save_scene.refresh_slots()
                                     start_loading("WORLD")
                                 else:
+                                    # 已有存档，确认覆盖
                                     show_confirm_dialog = True
                                     confirm_selected_index = 1
 

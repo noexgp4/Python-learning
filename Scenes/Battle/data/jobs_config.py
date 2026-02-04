@@ -11,6 +11,10 @@ _WARRIOR = {
     "def": 15,
     "spd": 8,
     "skills": ["basic_slash", "heavy_strike"],
+    "sprite_path": "Assets/Image/Characters/character.png", 
+    "frame_size": (16, 24),    # 你在 Aseprite 里设定的单格大小
+    "cols": 4,                 # 你导出时 Fixed Columns 设置的数量
+    "rows": 4,                  # 通常是 下、左、右、上 四行
     "sprite_index": 0,
     "world_speed": 100,
     "theme_color": (200, 120, 100)
@@ -26,6 +30,10 @@ _MAGE = {
     "def": 5,
     "spd": 10,
     "skills": ["fire_ball", "ice_shards"],
+    "sprite_path": "Assets/Image/Characters/character.png", 
+    "frame_size": (16, 24),
+    "cols": 4,
+    "rows": 4,
     "sprite_index": 1,
     "world_speed": 100,
     "theme_color": (100, 140, 220)

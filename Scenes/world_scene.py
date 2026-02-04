@@ -76,13 +76,20 @@ class WorldScene:
         player_screen_w = self.player.width * zoom
         player_screen_h = self.player.height * zoom
         
-        # 绘制玩家逻辑矩形（绿色，用于对比）
-        pygame.draw.rect(self.screen, (0, 255, 0), (player_screen_x, player_screen_y, player_screen_w, player_screen_h), 1)
+        # 绘制玩家逻辑矩形（绿色，用于对比，调试完成后可删除）
+        # pygame.draw.rect(self.screen, (0, 255, 0), (player_screen_x, player_screen_y, player_screen_w, player_screen_h), 1)
         
-        # 绘制玩家中心点
-        center_x = player_screen_x + player_screen_w / 2
-        center_y = player_screen_y + player_screen_h / 2
-        pygame.draw.circle(self.screen, (255, 0, 0), (int(center_x), int(center_y)), int(8 * zoom))
+        # 4. 绘制玩家实际雪碧图
+        player_img = self.player.get_current_image()
+        if player_img:
+            # 缩放到屏幕显示大小
+            draw_img = pygame.transform.scale(player_img, (int(player_screen_w), int(player_screen_h)))
+            self.screen.blit(draw_img, (player_screen_x, player_screen_y))
+        
+        # 绘制玩家中心点（调试用）
+        # center_x = player_screen_x + player_screen_w / 2
+        # center_y = player_screen_y + player_screen_h / 2
+        # pygame.draw.circle(self.screen, (255, 0, 0), (int(center_x), int(center_y)), int(8 * zoom))
 
     def handle_input(self, event):
         # 不再需要处理按键监听碰撞调试切换了
