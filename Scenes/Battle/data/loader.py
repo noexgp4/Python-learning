@@ -145,6 +145,10 @@ class Player:
                 if dy < 0: self.y = wall.bottom
                 break
 
+    def get_rect(self):
+        """返回玩家的逻辑碰撞矩形 (用于地图传送等检测)"""
+        return pygame.Rect(self.x, self.y, self.width, self.height)
+
     def get_current_image(self):
         """返回当前应该渲染的图像帧"""
         anim_key = self.direction

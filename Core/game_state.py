@@ -23,6 +23,9 @@ class GameState:
         
         # 进度记录
         self.current_scene = "STORY" 
+        self.current_map = "testmap.tmx" # 默认地图
+        self.player_x = None  # None 表示使用地图默认出生点
+        self.player_y = None
         self.unlocked_stages = [1]
         
         # 物品/装备
@@ -44,6 +47,9 @@ class GameState:
             "defense": self.defense,
             "spd": self.spd,
             "current_scene": self.current_scene,
+            "current_map": self.current_map,
+            "player_x": self.player_x,
+            "player_y": self.player_y,
             "unlocked_stages": self.unlocked_stages,
             "inventory": self.inventory
         }
@@ -63,5 +69,8 @@ class GameState:
         self.defense = data.get("defense", 5)
         self.spd = data.get("spd", 10)
         self.current_scene = data.get("current_scene", "Battle")
+        self.current_map = data.get("current_map", "testmap.tmx")
+        self.player_x = data.get("player_x")
+        self.player_y = data.get("player_y")
         self.unlocked_stages = data.get("unlocked_stages", [1])
         self.inventory = data.get("inventory", [])

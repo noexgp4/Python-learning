@@ -1,0 +1,26 @@
+{
+  "timestamp": 1770308479.1687505,
+  "time_str": "2026-02-06 00:21:19",
+  "data": {
+    "job_name": "Warrior",
+    "player_hp": 200,
+    "max_hp": 200,
+    "player_mp": 50,
+    "max_mp": 50,
+    "level": 1,
+    "exp": 0,
+    "gold": 0,
+    "attack": 25,
+    "m_attack": 0,
+    "defense": 15,
+    "spd": 8,
+    "current_scene": "WORLD",
+    "current_map": "city.tmx",
+    "player_x": 914.7999999999997,
+    "player_y": 515.0,
+    "unlocked_stages": [
+      1
+    ],
+    "inventory": []
+  }
+}

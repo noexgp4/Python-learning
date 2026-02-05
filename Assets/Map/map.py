@@ -9,11 +9,12 @@ class TiledMap:
         self.width = self.tmx_data.width * self.tmx_data.tilewidth
         self.height = self.tmx_data.height * self.tmx_data.tileheight
 
-        # 2. 初始化墙壁列表 (所有碰撞体都存这里)
+        # 2. 初始化列表
         self.walls = [] 
+        self.portals = [] # 存储传送门对象
         
-        # 遍历所有图层以加载碰撞信息
-        for layer in self.tmx_data.visible_layers:
+        # 遍历所有图层（包括隐藏图层，因为传送门等触发器通常不需要显示）
+        for layer in self.tmx_data.layers:
             # 策略 A: 瓦片图层 (Tile Layers)
             if isinstance(layer, pytmx.TiledTileLayer):
                 for x, y, gid in layer:
@@ -22,22 +23,16 @@ class TiledMap:
                     self._add_tile_collision(x * self.tmx_data.tilewidth, y * self.tmx_data.tileheight, gid)
                     
                     # 2. 检查瓷砖是否带有 'Wall' 自定义属性
-                    # pytmx 的 get_tile_properties_by_gid 会查找瓷砖集(Tileset)中定义的属性
                     props = self.tmx_data.get_tile_properties_by_gid(gid)
                     if props:
                         is_wall = False
-                        # 检查 Tiled 的几种不同属性存储方式
-                        # 1. 直接指定的 type (Tiled 1.8 之前) 或 class (Tiled 1.9+)
                         tile_type = props.get('type') or props.get('class')
                         if tile_type == 'Wall':
                             is_wall = True
-                        
-                        # 2. 自定义布尔属性 Wall
                         elif props.get('Wall') == True or str(props.get('Wall')).lower() == 'true':
                             is_wall = True
                         
                         if is_wall:
-                            # print(f"【调试】发现 Wall 属性图块: 坐标({x}, {y}), GID={gid}")
                             self.walls.append(pygame.Rect(
                                 x * self.tmx_data.tilewidth,
                                 y * self.tmx_data.tileheight,
@@ -47,15 +42,41 @@ class TiledMap:
             
             # 策略 B: 对象图层 (Object Groups)
             elif isinstance(layer, pytmx.TiledObjectGroup):
+                # 尝试多种方式获取图层类型
+                layer_class = getattr(layer, 'class', None) or layer.properties.get('class')
+                layer_type = getattr(layer, 'type', None) or layer.properties.get('type')
+                actual_layer_type = layer_class or layer_type
+                
+                # print(f"【调试】扫描对象层: '{layer.name}', Class: {layer_class}, Type: {layer_type}")
+                
                 for obj in layer:
-                    # 1. 专门的 "Collision" 层中的几何形状（直接用对象矩形）
+                    # 尝试多种方式获取对象类型
+                    obj_class = getattr(obj, 'class', None) or obj.properties.get('class')
+                    obj_type = getattr(obj, 'type', None) or obj.properties.get('type')
+                    actual_obj_type = obj_class or obj_type
+                    
+                    is_portal = False
+                    if actual_obj_type and str(actual_obj_type).lower() == 'portal':
+                        is_portal = True
+                    elif actual_layer_type and str(actual_layer_type).lower() == 'portal':
+                        is_portal = True
+                        
+                    if is_portal:
+                        # 关键：将图层的所有自定义属性同步给该对象，确保护送 target_map 等属性
+                        for key, value in layer.properties.items():
+                            if key not in obj.properties:
+                                obj.properties[key] = value
+                        
+                        self.portals.append(obj)
+                        print(f"【地图】成功识别传送门: {getattr(obj, 'name', '未命名')} @ ({obj.x}, {obj.y}) [类型:{actual_obj_type}, 图层类型:{actual_layer_type}]")
+                        continue 
+
+                    # 1. 专门的 "Collision" 层中的几何形状
                     if layer.name == "Collision":
                         self.walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
                     
-                    # 2. 其他对象层中带 GID 的图块对象 - 同样检查该瓷砖是否有自定义碰撞形状
+                    # 2. 其他对象层中带 GID 的图块对象
                     elif hasattr(obj, 'gid') and obj.gid:
-                        # 注意：pytmx 已自动处理 GID 对象的 Y 轴偏移（已从底部对齐转为左上角对齐）
-                        # 所以这里直接使用 obj.y 即可。
                         self._add_tile_collision(obj.x, obj.y, obj.gid)
 
     def _add_tile_collision(self, base_x, base_y, gid):

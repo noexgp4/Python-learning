@@ -15,6 +15,7 @@ from Scenes.world_scene import WorldScene
 from Scenes.Battle.BattleScene import BattleScene
 from Scenes.Battle.models.entity import Entity
 from Language.language_manager import LanguageManager
+from Assets.Map.SceneManager import SceneManager
 
 # --- 初始化 Pygame ---
 pygame.init()
@@ -39,6 +40,7 @@ menu_scene.set_sfx_callback(audio_manager.play_sfx)
 save_scene = SaveManager(screen)
 class_select_scene = ClassSelectScene(screen)
 global_ui_manager = UIManager(screen)
+scene_manager = SceneManager(screen) # 初始化地图场景管理器
 
 # --- 游戏全局变量 ---
 current_state = "MENU"
@@ -139,12 +141,23 @@ def main():
                         elif event.key == pygame.K_RETURN:
                             if confirm_selected_index == 0: # 确认覆盖
                                 current_slot_id = save_scene.get_selected_slot()
-                                # 保存前更新当前场景状态
+                                
+                                # 先同步数据再保存
+                                if current_game_state and scene_manager.current_scene:
+                                    scene = scene_manager.current_scene
+                                    if hasattr(scene, 'player'):
+                                        current_game_state.player_hp = scene.player.hp
+                                        current_game_state.player_mp = scene.player.mp
+                                        current_game_state.player_x = scene.player.x
+                                        current_game_state.player_y = scene.player.y
+                                        current_game_state.current_map = getattr(scene, 'map_name', 'testmap.tmx')
+                                
                                 current_game_state.current_scene = "WORLD"
                                 save_scene.save_game(current_game_state, current_slot_id)
                                 save_scene.refresh_slots()
                                 show_confirm_dialog = False
-                                start_loading("WORLD")
+                                # 直接返回世界，不重新加载场景（防止玩家位置重置）
+                                current_state = "WORLD" 
                             else:
                                 show_confirm_dialog = False
                         elif event.key == pygame.K_ESCAPE:
@@ -161,22 +174,26 @@ def main():
                         elif event.key == pygame.K_RETURN:
                             selected_index = save_scene.selected_index
                             if current_game_state is None:
-                                # 【加载模式】需确保存档存在
+                                # 【加载/新建自适应模式】
                                 if save_scene.slot_data[selected_index] is None:
-                                    print("槽位为空，无法加载！请先通过'开始冒险'创建存档。")
-                                    continue
-                                    
-                                current_slot_id = save_scene.slots[selected_index]
-                                loaded_state = save_scene.load_game(current_slot_id)
-                                if loaded_state:
-                                    current_game_state = loaded_state
-                                    # 智能跳转：如果存档记录在 WORLD，则直接进入地图
-                                    target = current_game_state.current_scene
-                                    if target == "WORLD":
-                                        start_loading("WORLD")
-                                    else:
-                                        story_scene = StoryScene(screen, current_game_state.job_name)
-                                        start_loading("STORY")
+                                    # 槽位为空：在此启动新游戏流程
+                                    is_new_game = True
+                                    current_slot_id = save_scene.slots[selected_index]
+                                    story_scene = StoryScene(screen, "冒险者")
+                                    current_state = "STORY"
+                                else:
+                                    # 槽位有档：执行加载
+                                    current_slot_id = save_scene.slots[selected_index]
+                                    loaded_state = save_scene.load_game(current_slot_id)
+                                    if loaded_state:
+                                        current_game_state = loaded_state
+                                        # 智能跳转
+                                        target = current_game_state.current_scene
+                                        if target == "WORLD":
+                                            start_loading("WORLD")
+                                        else:
+                                            story_scene = StoryScene(screen, current_game_state.job_name)
+                                            start_loading("STORY")
                             else:
                                 # 【新建/覆盖模式】(当前已有 current_game_state)
                                 if save_scene.slot_data[selected_index] is None:
@@ -214,10 +231,10 @@ def main():
 
                 # --- 世界地图 ---
                 elif current_state == "WORLD":
-                    if world_scene:
-                        world_scene.update(dt)
-                        world_scene.draw()
-                        res = world_scene.handle_input(event)
+                    if scene_manager.current_scene:
+                        scene_manager.current_scene.update(dt)
+                        scene_manager.current_scene.draw()
+                        res = scene_manager.current_scene.handle_events(event)
                         if res == "MENU":
                             current_state = "MENU"
                         elif res == "BATTLE":
@@ -236,7 +253,16 @@ def main():
                             battle_scene = BattleScene(screen, player_ent, enemy_ent)
                             current_state = "BATTLE"
                         elif res == "SAVE":
-                            # 进入存档选择界面进行保存
+                            # 同步实时数据
+                            if current_game_state and scene_manager.current_scene:
+                                scene = scene_manager.current_scene
+                                if hasattr(scene, 'player'):
+                                    current_game_state.player_hp = scene.player.hp
+                                    current_game_state.player_mp = scene.player.mp
+                                    current_game_state.player_x = scene.player.x
+                                    current_game_state.player_y = scene.player.y
+                                    current_game_state.current_map = getattr(scene, 'map_name', 'testmap.tmx')
+
                             save_scene.refresh_slots()
                             current_state = "SAVE_SELECT"
 
@@ -261,7 +287,15 @@ def main():
                 # 当进入 WORLD 状态时初始化场景
                 if current_state == "WORLD":
                     job_name = current_game_state.job_name if current_game_state else "学生"
-                    world_scene = WorldScene(screen, job_name)
+                    # 使用存档中的坐标和地图名
+                    spawn_pos = None
+                    if current_game_state and current_game_state.player_x is not None:
+                        spawn_pos = (current_game_state.player_x, current_game_state.player_y)
+                    
+                    map_name = current_game_state.current_map if current_game_state else "testmap.tmx"
+                    
+                    world_scene = WorldScene(screen, scene_manager, job_name, map_name=map_name, spawn_pos=spawn_pos)
+                    scene_manager.switch_scene(world_scene) # 同步到管理器中
                 elif current_state == "BATTLE":
                     # 可以在这里初始化，但我们目前在事件中手动初始化了
                     pass
@@ -315,9 +349,9 @@ def main():
         elif current_state == "SETTINGS":
             settings_scene.draw()
         elif current_state == "WORLD":
-            if world_scene:
-                world_scene.update(dt)
-                world_scene.draw()
+            if scene_manager.current_scene:
+                scene_manager.current_scene.update(dt)
+                scene_manager.current_scene.draw()
             else:
                 # 备用显示
                 screen.fill((50, 50, 100))

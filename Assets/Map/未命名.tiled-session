@@ -3,30 +3,54 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "city.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
         "": {
             "scaleInDock": 1
         },
-        "MyDecorations.tsx": {
-            "dynamicWrapping": true
+        "Building.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
         },
-        "map2.tmx": {
+        "MyDecorations.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "city.tmx": {
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 506,
-                "y": 443
+                "x": 366,
+                "y": 398
+            }
+        },
+        "map2.tmx": {
+            "expandedObjectLayers": [
+                5,
+                6
+            ],
+            "scale": 1.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 372.66666666666663,
+                "y": 468.66666666666663
             }
         },
         "testmap.tmx": {
-            "scale": 0.82939453125,
-            "selectedLayer": 0,
+            "expandedObjectLayers": [
+                23,
+                25,
+                21,
+                28
+            ],
+            "scale": 1,
+            "selectedLayer": 8,
             "viewCenter": {
-                "x": 512.4219945837749,
-                "y": 512.421994583775
+                "x": 512,
+                "y": 511.5
             }
         },
         "testmap.tmx#Building": {
@@ -34,15 +58,22 @@
             "scaleInDock": 1
         },
         "testmap.tmx#terrain": {
+            "dynamicWrapping": false,
             "scaleInDock": 1
         }
     },
     "last.externalTilesetPath": "E:/Python learning/Python-learning/Python-learning/Assets/Map",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
+        "testmap.tmx",
+        "city.tmx"
     ],
     "project": "未命名.tiled-project",
+    "property.type": "string",
     "recentFiles": [
+        "testmap.tmx",
+        "city.tmx",
+        "map2.tmx"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
 }
