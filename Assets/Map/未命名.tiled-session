@@ -1,0 +1,48 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "MyDecorations.tsx": {
+            "dynamicWrapping": true
+        },
+        "map2.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 506,
+                "y": 443
+            }
+        },
+        "testmap.tmx": {
+            "scale": 0.82939453125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 512.4219945837749,
+                "y": 512.421994583775
+            }
+        },
+        "testmap.tmx#Building": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "testmap.tmx#terrain": {
+            "scaleInDock": 1
+        }
+    },
+    "last.externalTilesetPath": "E:/Python learning/Python-learning/Python-learning/Assets/Map",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+    ],
+    "project": "未命名.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
+}

@@ -1,7 +1,14 @@
 from .skills_library import SKILLS_LIB
 
+_BASE_SPRITE_CONFIG = {
+    "frame_size": (16, 24),  # 原始尺寸
+    "cols": 4,               # 4 帧动画
+    "rows": 8,               # 4 个方向（下、左、右、上）
+    "render_size": (32, 48), # 缩放后的渲染尺寸（保持比例）
+}
 # 职业数据定义
 _WARRIOR = {
+    **_BASE_SPRITE_CONFIG,
     "name": "学生",
     "desc": "坚韧的前线战士，擅长近战物理攻击。",
     "hp": 200,
@@ -12,15 +19,13 @@ _WARRIOR = {
     "spd": 8,
     "skills": ["basic_slash", "heavy_strike"],
     "sprite_path": "Assets/Image/Characters/character.png", 
-    "frame_size": (16, 24),    # 你在 Aseprite 里设定的单格大小
-    "cols": 4,                 # 你导出时 Fixed Columns 设置的数量
-    "rows": 4,                  # 通常是 下、左、右、上 四行
     "sprite_index": 0,
     "world_speed": 100,
     "theme_color": (200, 120, 100)
 }
 
 _MAGE = {
+    **_BASE_SPRITE_CONFIG,
     "name": "法师",
     "desc": "精通元素魔法，擅长范围与魔法伤害。",
     "hp": 100,
@@ -31,9 +36,6 @@ _MAGE = {
     "spd": 10,
     "skills": ["fire_ball", "ice_shards"],
     "sprite_path": "Assets/Image/Characters/character.png", 
-    "frame_size": (16, 24),
-    "cols": 4,
-    "rows": 4,
     "sprite_index": 1,
     "world_speed": 100,
     "theme_color": (100, 140, 220)

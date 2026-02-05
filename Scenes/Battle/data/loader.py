@@ -3,6 +3,7 @@ from .skills_library import SKILLS_LIB
 from .jobs_config import JOBS
 from Assets.Map.map import TiledMap
 
+
 class Player:
     # 初始化玩家
 
@@ -25,6 +26,11 @@ class Player:
         self.anim_timer = 0
         self.anim_speed = 0.15 # 秒/帧
         self.is_moving = False  
+        self.is_running = False # 新增：加速状态
+
+        # 属性状态
+        self.hp = self.max_hp = self.job_data.get("hp", 100)
+        self.mp = self.max_mp = self.job_data.get("mp", 50)
 
     def _cut_spritesheet(self):
         """
@@ -53,10 +59,14 @@ class Player:
         rows = data["rows"]
         
         animations = {
-            "down": [],
-            "left": [],
-            "right": [],
-            "up": []
+            "down": [], "left": [], "right": [], "up": [],
+            "run_down": [], "run_left": [], "run_right": [], "run_up": []
+        }
+
+        # 方向映射表
+        row_to_key = {
+            0: "down", 1: "left", 2: "right", 3: "up",
+            4: "run_down", 5: "run_left", 6: "run_right", 7: "run_up"
         }
 
         for r in range(rows):
@@ -64,15 +74,10 @@ class Player:
                 rect = pygame.Rect(c * fw, r * fh, fw, fh)
                 frame = sheet.subsurface(rect)
                 
-                # 关键：缩放回 32x32
+                # 缩放至渲染尺寸
                 frame = pygame.transform.scale(frame, (self.width, self.height))
                 
-                # 映射到方向
-                if r == 0: anim_key = "down"
-                elif r == 1: anim_key = "left"
-                elif r == 2: anim_key = "right"
-                else: anim_key = "up"
-                
+                anim_key = row_to_key.get(r, "down")
                 animations[anim_key].append(frame)
                 
         return animations
@@ -82,8 +87,12 @@ class Player:
         speed = self.world_speed
 
         # Shift 加速
-        if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+        self.is_running = (keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT])
+        if self.is_running:
             speed *= 2
+            self.anim_speed = 0.1 # 加速时动作也变快
+        else:
+            self.anim_speed = 0.15
 
         distance = speed * dt
 
@@ -138,7 +147,15 @@ class Player:
 
     def get_current_image(self):
         """返回当前应该渲染的图像帧"""
-        anim = self.animations.get(self.direction, [])
+        anim_key = self.direction
+        if self.is_running and self.is_moving:
+            anim_key = f"run_{self.direction}"
+            
+        anim = self.animations.get(anim_key, [])
+        if not anim:
+            # 如果没有加速动画，回退到普通动画
+            anim = self.animations.get(self.direction, [])
+            
         if not anim:
             return None
         return anim[self.frame_index % len(anim)]
