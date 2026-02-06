@@ -1,0 +1,71 @@
+{
+    "Warrior": {
+        "name_key": "warrior_name",
+        "desc_key": "warrior_desc",
+        "hp": 200,
+        "mp": 50,
+        "atk": 25,
+        "m_atk": 0,
+        "def": 15,
+        "spd": 8,
+        "avatar_path": "Assets/Image/Characters/Thinker.png",
+        "skills": [
+            "basic_slash",
+            "heavy_strike"
+        ],
+        "sprite_path": "Assets/Image/Characters/character.png",
+        "sprite_index": 0,
+        "world_speed": 100,
+        "theme_color": [
+            200,
+            120,
+            100
+        ]
+    },
+    "Thinker": {
+        "name_key": "thinker_name",
+        "desc_key": "thinker_desc",
+        "hp": 150,
+        "mp": 100,
+        "atk": 10,
+        "m_atk": 0,
+        "def": 10,
+        "spd": 12,
+        "avatar_path": "Assets/Image/Characters/Thinker.png",
+        "skills": [
+            "basic_slash",
+            "heavy_strike"
+        ],
+        "sprite_path": "Assets/Image/Characters/character.png",
+        "sprite_index": 0,
+        "world_speed": 100,
+        "theme_color": [
+            200,
+            120,
+            100
+        ]
+    },
+    "Mage": {
+        "name_key": "mage_name",
+        "desc_key": "mage_desc",
+        "hp": 100,
+        "mp": 180,
+        "atk": 5,
+        "m_atk": 30,
+        "def": 5,
+        "spd": 10,
+        "avatar_path": "Assets/Image/Characters/Mage.png",
+        "skills": [
+            "fire_ball",
+            "ice_shards"
+        ],
+        "sprite_path": "Assets/Image/Characters/character.png",
+        "sprite_index": 1,
+        "world_speed": 100,
+        "theme_color": [
+            100,
+            140,
+            220
+        ]
+    }
+}

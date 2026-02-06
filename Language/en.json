@@ -24,5 +24,15 @@
         "skip": "ESC to skip",
         "confirm": "Enter to confirm",
         "back": "Backspace to back"
+    },
+    "battle": {
+        "win": "Victory!",
+        "lose": "Defeat!"
+    },
+    "class_select": {
+        "title": "Select Your Initial Class",
+        "hp": "HP",
+        "mp": "MP",
+        "atk": "ATK"
     }
 }

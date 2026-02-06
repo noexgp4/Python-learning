@@ -6,6 +6,7 @@ BASE_MAGIC  = {"type": TYPE_MAGIC, "color": C_BLUE, "cost": 25}
 
 # --- 核心技能库 (字典) ---
 SKILLS_LIB = {
+    # --主动技能--
     "basic_slash": {
         **BASE_PHYSIC,
         "id": "basic_slash",
@@ -21,6 +22,7 @@ SKILLS_LIB = {
         "cost": 20,
         "power": 45,
         "effects": [{"id": "STUN", "chance": 0.1}],
+        "desc": "对单体造成重击，有几率眩晕。"
     },
     "fire_ball": {
         **BASE_MAGIC,
@@ -28,13 +30,49 @@ SKILLS_LIB = {
         "name": "火球术",
         "power": 40,
         "effects": [{"id": "BURN", "chance": 0.5}],
+        "desc": "对多个目标释放8颗火球,8颗按目标人数分摊数量"
     },
-    "ice_shards": {
+    "drain_magic": {
+        **BASE_MAGIC,
+        "id": "drain_magic",
+        "name": "吸取魔法",
+        "power": 20,
+        "effects": [{"id": "DRAIN_MAGIC", "chance": 0.5}],
+        "desc": "吸取目标一定比例的魔法值，没有魔法值时转为造成伤害"
+    },
+    "ice_shards": { 
         **BASE_MAGIC,
         "id": "ice_shards",
         "name": "寒冰箭",
         "power": 30,
         "effects": [{"id": "FREEZE", "chance": 0.4}],
+        "desc": "对多个目标释放8颗寒冰箭,8颗按目标人数分摊数量"
+    },
+    # --被动技能--
+    "greedy": {
+        "id": "greedy",
+        "name": "贪婪",
+        "desc": "释放技能时有10%的概率重复释放3次"
+    },
+    "bleed": {
+        "id": "bleed",
+        "name": "流血",
+        "desc": "受到伤害时，有几率造成流血。"
+    },
+    "stun": {
+        "id": "stun",
+        "name": "眩晕",
+        "desc": "受到伤害时，有几率眩晕。"
+    },
+    "burn": {
+        "id": "burn",
+        "name": "燃烧",
+        "desc": "受到伤害时，有几率燃烧。"
+    },
+    "freeze": {
+        "id": "freeze",
+        "name": "冻结",
+        "desc": "受到伤害时，有几率冻结。"
     }
 }
 

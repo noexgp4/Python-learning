@@ -30,12 +30,18 @@ class ClassSelectScene:
             print(f"加载职业雪碧图失败: {e}")
 
     def draw(self):
+        # 尝试获取语言管理器
+        lang_manager = getattr(pygame, 'language_manager', None)
+        def get_text(cat, key, default):
+            if lang_manager: return lang_manager.get_text(cat, key)
+            return default
+
         # 填充深色背景
         self.screen.fill(getattr(UIConfig, 'COLOR_DARK_BG', (30, 30, 30)))
         self.ui_manager.clear()
         
-        # 1. 标题 (Label 自动支持 render_text)
-        title_text = "请选择你的初始职业"
+        # 1. 标题
+        title_text = get_text("class_select", "title", "请选择你的初始职业")
         tw = UIConfig.TITLE_FONT.size(title_text)[0]
         self.ui_manager.add_component(Label((self.screen.get_width() - tw)//2, 50, title_text, "title", UIConfig.COLOR_YELLOW))
 
@@ -46,17 +52,25 @@ class ClassSelectScene:
         # 2. 左侧：职业列表与属性
         for i, name in enumerate(self.class_names):
             is_selected = (i == self.selected_index)
-            # 注意：JOBS_DATA 中使用的是 theme_color，而不是之前的 color
-            color = CLASSES[name].get("theme_color", (150, 150, 150)) if is_selected else (150, 150, 150)
-            display_text = f"▶ {name}" if is_selected else f"  {name}"
+            job_data = CLASSES[name]
+            # 获取本地化的职业名称 (通过 jobs_config 已经合并进来的 'name' 字段)
+            display_name = job_data.get("name", name)
+            
+            color = job_data.get("theme_color", (150, 150, 150)) if is_selected else (150, 150, 150)
+            display_text = f"▶ {display_name}" if is_selected else f"  {display_name}"
             self.ui_manager.add_component(Label(LEFT_COLUMN_X, 200 + i * 60, display_text, "normal", color))
 
             if is_selected:
-                info = CLASSES[name]
-                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 520, info["desc"], "small", (200, 200, 200)))
-                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 555, f"生命值: {info['hp']}", "small", (255, 100, 100)))
-                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 590, f"消耗值: {info['mp']}", "small", (100, 200, 255)))
-                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 625, f"攻击力: {info['atk']}/{info['m_atk']}", "small", (100, 255, 100)))
+                info = job_data
+                # 获取翻译后的标签
+                hp_label = get_text("class_select", "hp", "生命值")
+                mp_label = get_text("class_select", "mp", "消耗值")
+                atk_label = get_text("class_select", "atk", "攻击力")
+                
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 520, info.get("desc", ""), "small", (200, 200, 200)))
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 555, f"{hp_label}: {info.get('hp', 0)}", "small", (255, 100, 100)))
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 590, f"{mp_label}: {info.get('mp', 0)}", "small", (100, 200, 255)))
+                self.ui_manager.add_component(Label(LEFT_COLUMN_X + 20, 625, f"{atk_label}: {info.get('atk', 0)}/{info.get('m_atk', 0)}", "small", (100, 255, 100)))
 
         # 3. 右侧：职业配图
         selected_class = self.class_names[self.selected_index]

@@ -113,6 +113,13 @@ class SettingsScene:
             # 确保语言管理器状态同步
             self.language_manager.change_language(self.current_language)
             
+            # 同时也需要告诉职业系统重新加载对应语言的翻译
+            try:
+                from Scenes.Battle.data.jobs_config import load_jobs_config
+                load_jobs_config(self.current_language)
+            except Exception as e:
+                print(f"[Warning] Failed to reload jobs config: {e}")
+            
             # 四舍五入到2位小数避免浮点数精度问题
             data = {
                 "bgm_volume": round(self.bgm_volume, 2),

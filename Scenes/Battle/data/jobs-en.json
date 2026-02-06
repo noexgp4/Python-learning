@@ -1,0 +1,18 @@
+{
+    "Warrior": {
+        "name": "Warrior",
+        "desc": "A melee class with high HP and defense, specialized in physical attacks."
+    },
+    "Mage": {
+        "name": "Mage",
+        "desc": "A ranged class proficient in elemental magic, fragile but capable of great destruction."
+    },
+    "Thinker": {
+        "name": "Thinker",
+        "desc": "A ranged class proficient in elemental magic, fragile but capable of great destruction."
+    },
+    "Assassin": {
+        "name": "Assassin",
+        "desc": "A ranged class proficient in elemental magic, fragile but capable of great destruction."
+    }
+}

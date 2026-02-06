@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "city.tmx",
+    "activeFile": "testmap.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -23,8 +23,8 @@
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 366,
-                "y": 398
+                "x": 480,
+                "y": 320.5
             }
         },
         "map2.tmx": {
@@ -41,16 +41,16 @@
         },
         "testmap.tmx": {
             "expandedObjectLayers": [
-                23,
+                28,
                 25,
-                21,
-                28
+                23,
+                21
             ],
             "scale": 1,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 512,
-                "y": 511.5
+                "x": 564,
+                "y": 477
             }
         },
         "testmap.tmx#Building": {
@@ -71,8 +71,8 @@
     "project": "未命名.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "testmap.tmx",
         "city.tmx",
+        "testmap.tmx",
         "map2.tmx"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"

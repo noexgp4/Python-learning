@@ -11,6 +11,7 @@ class StatusHUD:
         self.height = 15     # 条的高度
         
         # 颜色定义
+        self.COLOR_BG = (7, 59, 50)
         self.COLOR_BG = (50, 50, 50)     # 底色（深灰）
         self.COLOR_HP = (200, 50, 50)    # 血条（红）
         self.COLOR_MP = (50, 100, 200)   # 蓝条（蓝）
