@@ -1,7 +1,7 @@
 {
     "Slime_Green": {
         "name": "绿史莱姆",
-        "hp": 60,
+        "hp": 600,
         "mp": 0,
         "atk": 12,
         "def": 5,

@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "testmap.tmx",
+    "activeFile": "city.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -13,21 +13,23 @@
         },
         "Building.tsx": {
             "dynamicWrapping": true,
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 0.75
         },
         "MyDecorations.tsx": {
             "dynamicWrapping": true,
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "city.tmx": {
             "expandedObjectLayers": [
                 5
             ],
-            "scale": 8,
-            "selectedLayer": 3,
+            "scale": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 527.125,
-                "y": 559.875
+                "x": 528.5,
+                "y": 464
             }
         },
         "map2.tmx": {
@@ -42,18 +44,23 @@
                 "y": 468.66666666666663
             }
         },
+        "terrain.tsx": {
+            "scaleInDock": 1
+        },
         "testmap.tmx": {
             "expandedObjectLayers": [
+                20,
+                26,
                 25,
                 28,
                 23,
                 21
             ],
-            "scale": 8,
-            "selectedLayer": 8,
+            "scale": 1,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 116.375,
-                "y": 126.5
+                "x": 394.5,
+                "y": 243
             }
         },
         "testmap.tmx#Building": {
@@ -69,13 +76,17 @@
     "map.lastUsedFormat": "tmx",
     "openFiles": [
         "testmap.tmx",
-        "city.tmx"
+        "city.tmx",
+        "Building.tsx",
+        "MyDecorations.tsx"
     ],
     "project": "未命名.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "city.tmx",
         "testmap.tmx",
+        "MyDecorations.tsx",
+        "Building.tsx",
+        "city.tmx",
         "map2.tmx"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
