@@ -55,65 +55,53 @@ class WorldScene:
 
         # 检测传送门碰撞
         player_rect = self.player.get_rect()
-        if self.tiled_map.portals and pygame.time.get_ticks() % 1000 < 20: # 每秒打印一次，避免刷屏
-             print(f"【调试】正在检测传送碰撞，当前地图传送门数量: {len(self.tiled_map.portals)}")
-             
         for portal in self.tiled_map.portals:
             portal_rect = pygame.Rect(portal.x, portal.y, portal.width, portal.height)
             if player_rect.colliderect(portal_rect):
-                self._handle_teleport(portal)
+                # 返回传送指令和数据，交给 main.py 处理加载页
+                teleport_data = self._get_teleport_info(portal)
+                if teleport_data:
+                    return "TELEPORT", teleport_data
                 break
 
         self.camera.update(self.player.x, self.player.y, self.player.width, self.player.height)
+        return None, None
 
-    def _handle_teleport(self, portal):
-        """处理传送逻辑"""
-        # 尝试多种可能的属性命名方式
-        target_map = (portal.properties.get("target_map") or 
-                      portal.properties.get("targetMap") or 
-                      portal.properties.get("destination") or
-                      getattr(portal, "target_map", None))
+    def _get_teleport_info(self, portal):
+        """仅提取传送信息，不执行切换"""
+        properties = portal.properties
+        target_map = (properties.get("target_map") or 
+                      properties.get("targetMap") or 
+                      properties.get("destination"))
         
-        target_portal_name = (portal.properties.get("target_portal") or 
-                             portal.properties.get("targetPortal") or 
-                             getattr(portal, "target_portal", None))
+        target_portal_name = (properties.get("target_portal") or 
+                             properties.get("targetPortal"))
 
         if not target_map:
-            print(f"【警告】传送门 '{getattr(portal, 'name', '未命名')}' 未定义 target_map 属性")
-            print(f"【调试】当前对象属性列表: {portal.properties}")
-            return
+            return None
 
-        print(f"【传送】正在前往地图: {target_map}, 目标点: {target_portal_name}")
-        
-        # 加载目标地图以获取目标位置
+        # 预计算落脚点，确保加载完后位置正确
         base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
         target_map_path = os.path.join(base_dir, "Assets", "Map", target_map)
         
+        spawn_pos = (0, 0)
         try:
             temp_map = TiledMap(target_map_path)
-            spawn_pos = None
-            
-            # 在目标地图中寻找对应的传送点作为落脚点
             if target_portal_name:
-                for p in temp_map.portals:
-                    if p.name == target_portal_name:
-                        # 为了防止传送后立刻再次触发，可以将位置稍微偏移一点，或者在 Player 里加个冷却
-                        spawn_pos = (p.x, p.y)
-                        break
-            
-            # 如果没找到落脚点，就用目标地图的默认出生点
-            if not spawn_pos:
-                spawn_pos = temp_map.get_player_spawn_point()
-
-            # 执行场景切换
-            new_scene = WorldScene(self.screen, self.manager, self.job_name, target_map, spawn_pos, self.debug_collision)
-            if self.manager:
-                self.manager.switch_scene(new_scene)
+                p = temp_map.get_object_by_name(target_portal_name)
+                if p:
+                    spawn_pos = (p.x, p.y + p.height + 10) # 增加一些位移防止循环触发
+                else:
+                    spawn_pos = temp_map.get_player_spawn_point()
             else:
-                # 如果没有管理器，则尝试直接更新当前对象（这种方式不推荐，但作为兜底）
-                print("【错误】未找到 SceneManager，无法切换场景")
-        except Exception as e:
-            print(f"【错误】传送失败: {e}")
+                spawn_pos = temp_map.get_player_spawn_point()
+        except:
+            pass
+
+        return {
+            "map": target_map,
+            "pos": spawn_pos
+        }
 
     def draw(self, screen=None):
         if screen is None:

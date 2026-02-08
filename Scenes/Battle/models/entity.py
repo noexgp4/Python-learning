@@ -25,7 +25,17 @@ class Entity:
         self.gold_reward = data_dict.get("gold", 0)
         self.ai_type = data_dict.get("ai_type", "IDLE")
         self.image_key = data_dict.get("image_key", None)
+        
+        # 状态效果
+        self.status_effects = []
     
+    def add_status(self, status_id):
+        """为实体添加状态效果"""
+        if status_id not in [s['id'] for s in self.status_effects]:
+            # 这里可以扩展从状态库加载具体效果，目前简单记录ID
+            self.status_effects.append({"id": status_id, "duration": 3})
+            print(f"{self.name} 获得了状态: {status_id}")
+
     def _load_skills(self, skills_raw):
         """加载技能数据
         
@@ -48,6 +58,11 @@ class Entity:
         else:
             # 已经是完整对象,直接返回(向后兼容)
             return skills_raw
+
+    @property
+    def active_skills(self):
+        """返回主动技能（即包含 cost 或 type 的技能）"""
+        return [s for s in self.skills if "cost" in s or "type" in s]
 
     @classmethod
     def from_job(cls, job_key):

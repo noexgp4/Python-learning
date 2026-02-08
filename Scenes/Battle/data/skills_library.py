@@ -7,6 +7,20 @@ BASE_MAGIC  = {"type": TYPE_MAGIC, "color": C_BLUE, "cost": 25}
 # --- 核心技能库 (字典) ---
 SKILLS_LIB = {
     # --主动技能--
+    "aim": {
+        "id": "aim",
+        "name": "狙击",
+        "cost": 1,
+        "power": 20,
+        "desc": "瞄准目标一回合，下回合造成附加伤害并暴击"
+    },
+    "shotgun": {
+        "id": "shotgun",
+        "name": "霰弹枪",
+        "cost": 2,
+        "power": 20,
+        "desc": "射击目标弹射到后方玩家,消耗2子弹"
+    },
     "basic_slash": {
         **BASE_PHYSIC,
         "id": "basic_slash",

@@ -78,7 +78,7 @@ def main():
     
     while True:
         dt = clock.tick(60) / 1000.0
-        # 1. 事件处理
+        # 1. 事件处理 (仅处理输入，不处理逻辑更新)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -229,31 +229,22 @@ def main():
                         settings_scene.cancel_settings()
                         current_state = "MENU"
 
-                # --- 世界地图 ---
+                # --- 世界地图：仅处理按键事件，不更新逻辑 ---
                 elif current_state == "WORLD":
                     if scene_manager.current_scene:
-                        scene_manager.current_scene.update(dt)
-                        scene_manager.current_scene.draw()
                         res = scene_manager.current_scene.handle_events(event)
                         if res == "MENU":
                             current_state = "MENU"
                         elif res == "BATTLE":
-                            # 1. 根据存档中的职业名称初始化玩家实体
                             job_key = current_game_state.job_name if current_game_state else "学生"
                             player_ent = Entity.from_job(job_key)
-                            
-                            # 2. 从存档同步实时属性
                             if player_ent and current_game_state:
                                 player_ent.hp = current_game_state.player_hp
                                 player_ent.mp = current_game_state.player_mp
-                            
-                            # 3. 初始化怪物实体
                             enemy_ent = Entity.from_monster("Slime_Green")
-                            
                             battle_scene = BattleScene(screen, player_ent, enemy_ent)
                             current_state = "BATTLE"
                         elif res == "SAVE":
-                            # 同步实时数据
                             if current_game_state and scene_manager.current_scene:
                                 scene = scene_manager.current_scene
                                 if hasattr(scene, 'player'):
@@ -262,9 +253,19 @@ def main():
                                     current_game_state.player_x = scene.player.x
                                     current_game_state.player_y = scene.player.y
                                     current_game_state.current_map = getattr(scene, 'map_name', 'testmap.tmx')
-
                             save_scene.refresh_slots()
                             current_state = "SAVE_SELECT"
+
+        # 1.5 逻辑更新逻辑 (移出事件循环，确保每帧只执行一次)
+        if current_state == "WORLD":
+             if scene_manager.current_scene:
+                update_res, update_data = scene_manager.current_scene.update(dt)
+                if update_res == "TELEPORT":
+                    if current_game_state:
+                        current_game_state.current_map = update_data["map"]
+                        current_game_state.player_x = update_data["pos"][0]
+                        current_game_state.player_y = update_data["pos"][1]
+                        start_loading("WORLD")
 
                 # --- 战斗界面 ---
                 elif current_state == "BATTLE":
@@ -350,7 +351,7 @@ def main():
             settings_scene.draw()
         elif current_state == "WORLD":
             if scene_manager.current_scene:
-                scene_manager.current_scene.update(dt)
+                # 注意：update 已经在事件循环前面的状态逻辑中跑过了，这里不要再跑
                 scene_manager.current_scene.draw()
             else:
                 # 备用显示

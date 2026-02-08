@@ -20,11 +20,14 @@
             "scaleInDock": 1
         },
         "city.tmx": {
-            "scale": 1,
-            "selectedLayer": 1,
+            "expandedObjectLayers": [
+                5
+            ],
+            "scale": 8,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 480,
-                "y": 320.5
+                "x": 527.125,
+                "y": 559.875
             }
         },
         "map2.tmx": {
@@ -41,16 +44,16 @@
         },
         "testmap.tmx": {
             "expandedObjectLayers": [
-                28,
                 25,
+                28,
                 23,
                 21
             ],
-            "scale": 1,
+            "scale": 8,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 564,
-                "y": 477
+                "x": 116.375,
+                "y": 126.5
             }
         },
         "testmap.tmx#Building": {

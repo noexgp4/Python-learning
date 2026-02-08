@@ -32,7 +32,7 @@ class BattleScene:
         if self.is_waiting_for_enemy or self.system.state != "IDLE":
             return None
 
-        options_count = len(self.main_options) if self.current_menu == "MAIN" else len(self.player.skills)
+        options_count = len(self.main_options) if self.current_menu == "MAIN" else len(self.player.active_skills)
         cols = 2
 
         # 网格导航逻辑
@@ -84,7 +84,8 @@ class BattleScene:
         # 2. 处理飘字特效
         if self.system.action_result:
             res = self.system.action_result
-            pos = (self.screen.get_width() - 300, 150) if res['target'] == self.enemy else (300, self.screen.get_height() - 350)
+            # 伤害数字漂浮位置：目标是敌人则在左半边，目标是玩家则在右半边
+            pos = (200, 250) if res['target'] == self.enemy else (self.screen.get_width() - 300, self.screen.get_height() - 350)
             self.ui.trigger_damage_num(res['damage'], pos)
             self.system.action_result = {}
 
@@ -104,6 +105,7 @@ class BattleScene:
         UIConfig.draw_center_text(self.screen, UIConfig.render_text(self.system.battle_log, "normal"), 50)
 
         # 状态条与背景
+        self.ui.draw_character_portraits(self.player, self.enemy)
         self.ui.draw_enemy_status(self.enemy)
         self.ui.draw_player_status(self.player)
 

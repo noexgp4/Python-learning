@@ -13,19 +13,43 @@ class ClassSelectScene:
         self.selected_index = 0
         self.ui_manager = UIManager(self.screen)
         
-        # 加载雪碧图
+        # 预加载头像与雪碧图
+        self.avatars = {}
         self.sprites = []
+        
+        import os
+        base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+        
+        # 1. 加载头像 (由 jobs.json 提供的 avatar_path)
+        for name, data in CLASSES.items():
+            path = data.get("avatar_path")
+            if path:
+                try:
+                    # 尝试多种可能的路径组合
+                    full_path = os.path.join(base_dir, path)
+                    if not os.path.exists(full_path):
+                        # 尝试在 Characters/avatar 目录下找
+                        filename = os.path.basename(path)
+                        full_path = os.path.join(base_dir, "Assets", "Image", "Characters", "avatar", filename)
+                    
+                    if os.path.exists(full_path):
+                        img = pygame.image.load(full_path).convert_alpha()
+                        # 放大到 256x256
+                        self.avatars[name] = pygame.transform.scale(img, (256, 256))
+                    else:
+                        print(f"找不到职业头像文件: {path}")
+                except Exception as e:
+                    print(f"加载职业头像失败 ({name}): {e}")
+
+        # 2. 加载雪碧图 (作为备选)
         try:
-            # 优先尝试加载我们提取的 PNG，如果失败则静默处理
-            import os
-            base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
             sprite_path = os.path.join(base_dir, "Assets", "Image", "character_sprites.png")
-            sheet = pygame.image.load(sprite_path).convert_alpha()
-            for i in range(2):
-                rect = pygame.Rect(i * 32, 0, 32, 32)
-                sprite = sheet.subsurface(rect)
-                # 放大图片使其更清晰且符合大屏显示 (32x32 -> 256x256)
-                self.sprites.append(pygame.transform.scale(sprite, (256, 256)))
+            if os.path.exists(sprite_path):
+                sheet = pygame.image.load(sprite_path).convert_alpha()
+                for i in range(2):
+                    rect = pygame.Rect(i * 32, 0, 32, 32)
+                    sprite = sheet.subsurface(rect)
+                    self.sprites.append(pygame.transform.scale(sprite, (256, 256)))
         except Exception as e:
             print(f"加载职业雪碧图失败: {e}")
 
@@ -53,7 +77,6 @@ class ClassSelectScene:
         for i, name in enumerate(self.class_names):
             is_selected = (i == self.selected_index)
             job_data = CLASSES[name]
-            # 获取本地化的职业名称 (通过 jobs_config 已经合并进来的 'name' 字段)
             display_name = job_data.get("name", name)
             
             color = job_data.get("theme_color", (150, 150, 150)) if is_selected else (150, 150, 150)
@@ -62,7 +85,6 @@ class ClassSelectScene:
 
             if is_selected:
                 info = job_data
-                # 获取翻译后的标签
                 hp_label = get_text("class_select", "hp", "生命值")
                 mp_label = get_text("class_select", "mp", "消耗值")
                 atk_label = get_text("class_select", "atk", "攻击力")
@@ -74,19 +96,27 @@ class ClassSelectScene:
 
         # 3. 右侧：职业配图
         selected_class = self.class_names[self.selected_index]
-        sprite_idx = CLASSES[selected_class]["sprite_index"]
+        job_info = CLASSES[selected_class]
         
-        if sprite_idx < len(self.sprites):
-            char_sprite = self.sprites[sprite_idx]
-            if selected_class == "程序员" and sprite_idx == 0:
-                char_sprite = pygame.transform.flip(char_sprite, True, False)
-            
+        # 优先使用精美头像
+        display_img = self.avatars.get(selected_class)
+        
+        # 如果没有头像，回退到雪碧图
+        if not display_img:
+            sprite_idx = job_info.get("sprite_index", 0)
+            if sprite_idx < len(self.sprites):
+                display_img = self.sprites[sprite_idx]
+                # 针对特定职业做翻转处理（可选）
+                if selected_class == "程序员" and sprite_idx == 0:
+                    display_img = pygame.transform.flip(display_img, True, False)
+
+        if display_img:
             # 装饰框 (Panel)
             self.ui_manager.add_component(Panel(RIGHT_COLUMN_X - 20, 180, 296, 296, (60, 60, 60, 255), UIConfig.COLOR_YELLOW, 3, 15))
             # 图片 (ImageComponent)
-            self.ui_manager.add_component(ImageComponent(RIGHT_COLUMN_X, 200, char_sprite))
+            self.ui_manager.add_component(ImageComponent(RIGHT_COLUMN_X, 200, display_img))
         else:
-            # 占位符
+            # 最终占位符
             self.ui_manager.add_component(Panel(RIGHT_COLUMN_X, 200, 256, 256, (100, 100, 100, 255), border_radius=10))
             self.ui_manager.add_component(Label(RIGHT_COLUMN_X + 80, 310, "图片加载中...", "small", (150, 150, 150)))
         
