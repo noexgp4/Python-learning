@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "city.tmx",
+    "activeFile": "testmap.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -16,6 +16,26 @@
             "scaleInDock": 1,
             "scaleInEditor": 0.75
         },
+        "C:/Users/Suqb1/Downloads/TilesetGrass/grass_biome.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "C:/Users/Suqb1/Downloads/TilesetGrass/map1.tmx": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 168.16666666666666,
+                "y": 335.8333333333333
+            }
+        },
+        "C:/Users/Suqb1/Downloads/TilesetGrass/map2.tmx": {
+            "scale": 3.53875,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 119.95761215118333,
+                "y": 120.09890498057224
+            }
+        },
         "MyDecorations.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 1,
@@ -25,11 +45,11 @@
             "expandedObjectLayers": [
                 5
             ],
-            "scale": 1,
-            "selectedLayer": 2,
+            "scale": 0.75,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 528.5,
-                "y": 464
+                "x": 480.66666666666663,
+                "y": 318.66666666666663
             }
         },
         "map2.tmx": {
@@ -45,22 +65,24 @@
             }
         },
         "terrain.tsx": {
-            "scaleInDock": 1
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1.5
         },
         "testmap.tmx": {
             "expandedObjectLayers": [
                 20,
                 26,
-                25,
                 28,
+                21,
                 23,
-                21
+                25
             ],
             "scale": 1,
-            "selectedLayer": 4,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 394.5,
-                "y": 243
+                "x": 440.5,
+                "y": 294
             }
         },
         "testmap.tmx#Building": {
@@ -73,21 +95,28 @@
         }
     },
     "last.externalTilesetPath": "E:/Python learning/Python-learning/Python-learning/Assets/Map",
+    "last.imagePath": "E:/Python learning/Python-learning/Python-learning/Assets/Tiles/terrain/Grass",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
         "testmap.tmx",
         "city.tmx",
         "Building.tsx",
-        "MyDecorations.tsx"
+        "MyDecorations.tsx",
+        "C:/Users/Suqb1/Downloads/TilesetGrass/map1.tmx",
+        "terrain.tsx"
     ],
     "project": "未命名.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "testmap.tmx",
+        "terrain.tsx",
+        "C:/Users/Suqb1/Downloads/TilesetGrass/map1.tmx",
         "MyDecorations.tsx",
         "Building.tsx",
         "city.tmx",
+        "testmap.tmx",
+        "C:/Users/Suqb1/Downloads/TilesetGrass/map2.tmx",
         "map2.tmx"
     ],
-    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
+    "tileset.lastUsedFormat": "tsx"
 }

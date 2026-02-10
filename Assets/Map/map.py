@@ -10,7 +10,8 @@ class TiledMap:
 
         # 2. 初始化列表与查找表
         self.walls = [] 
-        self.portals = [] 
+        self.portals = []
+        self.encounter_areas = [] 
         self.objects_by_name = {} # 新增：按名字索引所有对象
         
         for layer in self.tmx_data.layers:
@@ -48,10 +49,11 @@ class TiledMap:
                         self.objects_by_name[obj_name] = obj
 
                     # 提取对象类别
-                    obj_class = (getattr(obj, 'class', None) or obj.properties.get('class') or getattr(obj, 'type', None) or obj.properties.get('type', '')).lower()
+                    obj_props = obj.properties
+                    obj_class = (getattr(obj, 'class', None) or obj_props.get('class') or getattr(obj, 'type', None) or obj_props.get('type', '')).lower()
                     
+                    # 1. 传送点判定
                     is_portal = (obj_class == 'portal' or layer_class == 'portal')
-                        
                     if is_portal:
                         # 属性同步：确保护送自定义属性
                         for key, value in layer.properties.items():
@@ -60,7 +62,17 @@ class TiledMap:
                         self.portals.append(obj)
                         continue 
 
-                    # 碰撞判定
+                    # 2. 遇怪区域判定 (EncounterAreas)
+                    if layer_name == "EncounterAreas" or obj_class == "encounterarea" or obj_props.get("enemy_group"):
+                        group_id = obj_props.get("enemy_group")
+                        if group_id:
+                            self.encounter_areas.append({
+                                "rect": pygame.Rect(obj.x, obj.y, obj.width, obj.height),
+                                "enemy_group": group_id
+                            })
+                        continue
+
+                    # 3. 碰撞判定
                     if layer_name == "Collision":
                         self.walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
                     elif hasattr(obj, 'gid') and obj.gid:

@@ -1,5 +1,6 @@
 import os
 import pygame
+import random
 from Assets.Map.map import TiledMap
 from Assets.Map.camera import Camera
 from Scenes.Battle.data.loader import Player
@@ -18,7 +19,7 @@ class WorldScene:
         base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
         map_path = os.path.join(base_dir, "Assets", "Map", map_name)
         self.tiled_map = TiledMap(map_path)
-        print(f"【地图】加载了 {map_name}, 包含 {len(self.tiled_map.walls)} 个碰撞墙, {len(self.tiled_map.portals)} 个传送点")
+        print(f"【地图】加载了 {map_name}, 包含 {len(self.tiled_map.walls)} 个碰撞墙, {len(self.tiled_map.portals)} 个传送点, {len(self.tiled_map.encounter_areas)} 个遇怪区")
 
         # 2. 确定出生点
         if spawn_pos:
@@ -42,8 +43,12 @@ class WorldScene:
         )
 
         self.debug_collision = debug_collision
+        self.movement_accumulator = 0 # 遇怪步数累加器
 
     def update(self, dt):
+        # 1. 保存移动前的坐标
+        old_x, old_y = self.player.x, self.player.y
+
         keys = pygame.key.get_pressed()
         self.player.update(
             dt, 
@@ -53,7 +58,28 @@ class WorldScene:
             self.tiled_map.height
         )
 
-        # 检测传送门碰撞
+        # 2. 计算移动距离
+        dx = self.player.x - old_x
+        dy = self.player.y - old_y
+        distance = (dx**2 + dy**2)**0.5
+        
+        if distance > 0:
+            self.movement_accumulator += distance
+            
+            # 每移动 32 像素(约一格)检查一次遇怪
+            if self.movement_accumulator >= 32:
+                self.movement_accumulator = 0
+                player_rect = self.player.get_rect()
+                
+                # 检查所有遇怪区域
+                for area in self.tiled_map.encounter_areas:
+                    if player_rect.colliderect(area["rect"]):
+                        # 触发几率(例如 15%)
+                        if random.random() < 0.15:
+                            print(f"【遭遇】触发随机战斗！区域群组: {area['enemy_group']}")
+                            return "BATTLE", {"enemy_group": area["enemy_group"]}
+
+        # 3. 检测传送门碰撞
         player_rect = self.player.get_rect()
         for portal in self.tiled_map.portals:
             portal_rect = pygame.Rect(portal.x, portal.y, portal.width, portal.height)

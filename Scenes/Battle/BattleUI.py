@@ -11,21 +11,38 @@ class BattleUI:
         self.screen.blit(surf, pos)
         return surf
 
-    def draw_character_portraits(self, player, enemy):
+    def draw_character_portraits(self, player, enemies, selected_idx=-1):
         sw, sh = self.screen.get_width(), self.screen.get_height()
         import os
         base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-        # 同一水平线 Y 坐标
-        ground_y = sh // 2 - 50
+        # 1. 绘制所有敌人 (根据配置的 pos)
+        for i, enemy in enumerate(enemies):
+            # 如果死亡，可以使用半透明
+            alpha = 255 if enemy.hp > 0 else 100
+            
+            # 使用配置中的位置，如果没有则默认
+            ex, ey = getattr(enemy, 'pos', (150, sh // 2 - 50))
+            
+            # 如果被选中且未死亡，绘制光圈
+            if i == selected_idx and enemy.hp > 0:
+                # 绘制底座光圈
+                pygame.draw.ellipse(self.screen, (255, 215, 0), (ex - 10, ey + 80, 120, 40), 3)
+                # 绘制指示箭头 - 修复参数错误，直接 blit
+                arrow_surf = UIConfig.render_text("▼", "normal", (255, 215, 0))
+                # 简单的跳动动画
+                bounce = abs(int(pygame.time.get_ticks() / 200) % 10 - 5) * 4
+                self.screen.blit(arrow_surf, (ex + 50 - arrow_surf.get_width() // 2, ey - 30 + bounce))
 
-        # 1. 绘制敌人 (左侧)
-        # 占位符或怪物图
-        enemy_pos = (150, ground_y)
-        pygame.draw.circle(self.screen, (200, 50, 50), (enemy_pos[0] + 50, enemy_pos[1] + 50), 50)
-        self.draw_text(enemy.name, (enemy_pos[0] + 10, enemy_pos[1] + 110), (255, 100, 100), "small")
+            color = (200, 50, 50) if enemy.hp > 0 else (100, 100, 100)
+            pygame.draw.circle(self.screen, color, (ex + 50, ey + 50), 50)
+            
+            name_color = (255, 100, 100) if enemy.hp > 0 else (150, 150, 150)
+            self.draw_text(enemy.name, (ex + 10, ey + 110), name_color, "small")
 
         # 2. 绘制玩家 (右侧)
+        # 同一水平线 Y 坐标
+        ground_y = sh // 2 - 50
         try:
             from Core.game_config import CLASSES
             job_data = CLASSES.get(player.job_name, {})
@@ -34,9 +51,7 @@ class BattleUI:
                 full_path = os.path.join(base_dir, avatar_path)
                 if os.path.exists(full_path):
                     img = pygame.image.load(full_path).convert_alpha()
-                    # 左右对半，玩家在右边，面向左边 (翻转)
                     img = pygame.transform.flip(img, True, False)
-                    # 调整为合适大小 (如 200x200)
                     img = pygame.transform.scale(img, (200, 200))
                     self.screen.blit(img, (sw - 350, ground_y - 50))
         except: pass
@@ -52,7 +67,7 @@ class BattleUI:
         # 边框
         pygame.draw.rect(self.screen, (180, 160, 50), (x, y, width, height), 2)
         
-        # 数值标签在下方（如果有标签）
+        # 数值标签在下方
         if label:
             val_text = f"{label}: {int(current)} / {int(maximum)}"
             self.draw_text(val_text, (x, y + height + 2), color, "small")
@@ -69,22 +84,20 @@ class BattleUI:
 
     def draw_player_status(self, player):
         sw, sh = self.screen.get_width(), self.screen.get_height()
-        # 玩家血条跟随玩家（右侧上方）
         base_x = sw - 380
         base_y = sh // 2 - 150
         bar_w = 280
-        
         self.draw_bar(base_x, base_y, player.hp, player.max_hp, (50, 200, 50), width=bar_w, label="HP")
         self.draw_bar(base_x, base_y + 45, player.mp, player.max_mp, player.theme_color, width=bar_w, label="MP")
 
-    def draw_enemy_status(self, enemy):
-        sw, sh = self.screen.get_width(), self.screen.get_height()
-        # 敌人血条跟随敌人（左侧上方）
-        base_x = 100
-        base_y = sh // 2 - 150
-        bar_w = 280
-        self.draw_text(enemy.name, (base_x, base_y - 40), (255, 100, 100))
-        self.draw_bar(base_x, base_y, enemy.hp, enemy.max_hp, (200, 50, 50), width=bar_w, label="HP")
+    def draw_enemy_status(self, enemies):
+        # 多怪状态显示：我们简单地在每个怪物头顶显示一个小血条
+        for enemy in enemies:
+            if enemy.hp <= 0: continue
+            
+            ex, ey = getattr(enemy, 'pos', (150, 250))
+            # 怪物头顶血条
+            self.draw_bar(ex, ey - 30, enemy.hp, enemy.max_hp, (200, 50, 50), width=100, height=8, label=None)
 
     def draw_menu_grid(self, options, selected_idx, player_color):
         sw, sh = self.screen.get_width(), self.screen.get_height()

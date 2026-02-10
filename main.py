@@ -15,6 +15,7 @@ from Scenes.world_scene import WorldScene
 from Scenes.Battle.BattleScene import BattleScene
 from Scenes.Battle.models.entity import Entity
 from Language.language_manager import LanguageManager
+from Scenes.Battle.data.monsters_config import MONSTERS_DATA, ENEMY_GROUPS
 from Assets.Map.SceneManager import SceneManager
 
 # --- 初始化 Pygame ---
@@ -256,6 +257,17 @@ def main():
                             save_scene.refresh_slots()
                             current_state = "SAVE_SELECT"
 
+                # --- 战斗界面：处理输入 ---
+                elif current_state == "BATTLE":
+                    if battle_scene:
+                        res = battle_scene.handle_input(event)
+                        if res == "WORLD":
+                            current_state = "WORLD"
+                            # 同步战斗后的属性到存档对象
+                            if current_game_state:
+                                current_game_state.player_hp = battle_scene.system.player.hp
+                                current_game_state.player_mp = battle_scene.system.player.mp
+
         # 1.5 逻辑更新逻辑 (移出事件循环，确保每帧只执行一次)
         if current_state == "WORLD":
              if scene_manager.current_scene:
@@ -266,18 +278,44 @@ def main():
                         current_game_state.player_x = update_data["pos"][0]
                         current_game_state.player_y = update_data["pos"][1]
                         start_loading("WORLD")
+                elif update_res == "BATTLE":
+                    group_id = update_data.get("enemy_group")
+                    group_data = ENEMY_GROUPS.get(group_id)
+                    
+                    # 【核心容错】如果指定的群组不存在，随机选一个
+                    if not group_data:
+                        available_keys = list(ENEMY_GROUPS.keys())
+                        if available_keys:
+                            rand_key = random.choice(available_keys)
+                            group_data = ENEMY_GROUPS[rand_key]
+                            print(f"【警告】未找到群组ID '{group_id}'，随机切换到: {rand_key}")
 
-                # --- 战斗界面 ---
-                elif current_state == "BATTLE":
-                    if battle_scene:
-                        res = battle_scene.handle_input(event)
-                        if res == "WORLD":
-                            current_state = "WORLD"
-                            # 1. 同步战斗后的属性到存档对象
-                            if current_game_state:
-                                current_game_state.player_hp = battle_scene.system.player.hp
-                                current_game_state.player_mp = battle_scene.system.player.mp
-                                # 取消自动存档，仅同步数值
+                    if group_data and group_data.get("enemies"):
+                        # 1. 加载玩家实体
+                        job_key = current_game_state.job_name if current_game_state else "学生"
+                        player_ent = Entity.from_job(job_key)
+                        if player_ent and current_game_state:
+                            player_ent.hp = current_game_state.player_hp
+                            player_ent.mp = current_game_state.player_mp
+                        
+                        # 2. 【改进】加载群组中定义的所有怪物实体
+                        enemy_entities = []
+                        for enemy_info in group_data["enemies"]:
+                            monster_id = enemy_info["id"]
+                            # 处理 ID 模糊匹配
+                            actual_key = next((k for k in MONSTERS_DATA.keys() if k.lower() == monster_id.lower()), monster_id)
+                            enemy_ent = Entity.from_monster(actual_key)
+                            if enemy_ent:
+                                # 赋予初始坐标（用于 UI 布局参考）
+                                enemy_ent.pos = enemy_info.get("pos", (100, 200))
+                                enemy_entities.append(enemy_ent)
+                        
+                        if enemy_entities:
+                            battle_scene = BattleScene(screen, player_ent, enemy_entities)
+                            current_state = "BATTLE"
+                            print(f"【战斗】切入战斗场景，包含 {len(enemy_entities)} 个敌人")
+                        else:
+                            print(f"【错误】群组中没有找到有效的怪物定义")
         
         # 2. 状态逻辑更新 (主要是 LOADING)
         if current_state == "LOADING":
