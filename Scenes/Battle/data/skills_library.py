@@ -21,6 +21,13 @@ SKILLS_LIB = {
         "power": 20,
         "desc": "射击目标弹射到后方玩家,消耗2子弹"
     },
+    "Loading": {
+        "id": "Loading",
+        "name": "装填",
+        "cost": 0,
+        "power": 0,
+        "desc": "装填子弹"
+    },
     "basic_slash": {
         **BASE_PHYSIC,
         "id": "basic_slash",

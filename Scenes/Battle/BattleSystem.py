@@ -157,7 +157,12 @@ class BattleSystem:
         if self.state == "CHECK_DEATH":
             if all(e.hp <= 0 for e in self.enemies):
                 self.state = "WIN"
+                # 计算总收益
+                self.total_exp = sum(e.final_exp for e in self.enemies)
+                self.total_gold = sum(e.final_gold for e in self.enemies)
+                self.battle_log = f"战斗胜利！获得经验: {self.total_exp}，获得金币: {self.total_gold}"
             elif self.player.hp <= 0:
                 self.state = "LOSS"
+                self.battle_log = "全军覆没..."
             else:
                 self.state = "IDLE"

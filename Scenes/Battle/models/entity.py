@@ -21,10 +21,21 @@ class Entity:
         self.theme_color = data_dict.get("theme_color", (200, 200, 200))
         
         # 怪物特有属性
+        import random
         self.exp_reward = data_dict.get("exp", 0)
+        self.exp_min = data_dict.get("exp_min", self.exp_reward)
+        self.exp_max = data_dict.get("exp_max", self.exp_reward)
+        
         self.gold_reward = data_dict.get("gold", 0)
+        self.gold_min = data_dict.get("gold_min", self.gold_reward)
+        self.gold_max = data_dict.get("gold_max", self.gold_reward)
+        
         self.ai_type = data_dict.get("ai_type", "IDLE")
         self.image_key = data_dict.get("image_key", None)
+        
+        # 实时结算的 XP (在被击败时决定)
+        self.final_exp = random.randint(self.exp_min, self.exp_max) if self.exp_max >= self.exp_min else 0
+        self.final_gold = random.randint(self.gold_min, self.gold_max) if self.gold_max >= self.gold_min else 0
         
         # 状态效果
         self.status_effects = []

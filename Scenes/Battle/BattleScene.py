@@ -59,20 +59,38 @@ class BattleScene:
             cols = 1
 
         # --- 通用网格/列表导航 ---
-        if event.key == pygame.K_UP or event.key == pygame.K_w:
-            if self.selected_index >= cols: self.selected_index -= cols
-            else: self.selected_index = (self.selected_index + options_count - (options_count % cols or cols)) % options_count
-        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-            if self.selected_index + cols < options_count: self.selected_index += cols
-            else: self.selected_index %= cols
-        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            if self.selected_index % cols > 0: self.selected_index -= 1
-        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            if self.selected_index % cols < cols - 1 and self.selected_index + 1 < options_count:
-                self.selected_index += 1
-        
+        if self.current_menu == "TARGET":
+            living_indices = [i for i, e in enumerate(self.enemies) if e.hp > 0]
+            if not living_indices: return None
+            
+            try:
+                current_living_pos = living_indices.index(self.selected_index)
+            except ValueError:
+                current_living_pos = 0
+                self.selected_index = living_indices[0]
+
+            if event.key == pygame.K_UP or event.key == pygame.K_w or event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                current_living_pos = (current_living_pos - 1) % len(living_indices)
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_s or event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                current_living_pos = (current_living_pos + 1) % len(living_indices)
+            
+            self.selected_index = living_indices[current_living_pos]
+        else:
+            # --- 通用网格/列表导航 (MAIN, SKILL, CONFIRM_AIM) ---
+            if event.key == pygame.K_UP or event.key == pygame.K_w:
+                if self.selected_index >= cols: self.selected_index -= cols
+                else: self.selected_index = (self.selected_index + options_count - (options_count % cols or cols)) % options_count
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                if self.selected_index + cols < options_count: self.selected_index += cols
+                else: self.selected_index %= cols
+            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                if self.selected_index % cols > 0: self.selected_index -= 1
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                if self.selected_index % cols < cols - 1 and self.selected_index + 1 < options_count:
+                    self.selected_index += 1
+
         # --- 确认逻辑 ---
-        elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+        if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
             if self.current_menu == "MAIN":
                 choice = self.main_options[self.selected_index]
                 if choice == "普通攻击":
@@ -123,6 +141,7 @@ class BattleScene:
                     self.trigger_enemy_counter()
         
         elif event.key == pygame.K_ESCAPE:
+
             if self.current_menu == "CONFIRM_AIM": return None # 必须选，不能取消
             if self.current_menu == "SKILL":
                 self.current_menu = "MAIN"

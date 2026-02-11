@@ -1,3 +1,11 @@
+import json
+import os
+
+# 获取当前文件所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+monsters_json_path = os.path.join(current_dir, "monsters.json")
+
+# 默认数据，防止加载失败
 MONSTERS_DATA = {
     "Slime_Green": {
         "name": "绿史莱姆",
@@ -8,18 +16,19 @@ MONSTERS_DATA = {
         "skills": ["basic_slash"],
         "ai": "random",
         "image_key": "slime_green"
-    },
-    "Skeleton_Mage": {
-        "name": "骷髅法师",
-        "hp": 120,
-        "mp": 100,
-        "atk": 5,
-        "def": 2,
-        "ai": "cautious",
-        "skills": ["shadow_bolt"],
-        "image_key": "skeleton_mage"
     }
 }
+
+# 尝试从 JSON 加载
+if os.path.exists(monsters_json_path):
+    try:
+        with open(monsters_json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if data:
+                MONSTERS_DATA = data
+    except Exception as e:
+        print(f"[Error] Failed to load monsters.json: {e}")
+
 
 ENEMY_GROUPS = {
     "Slime_Green": {

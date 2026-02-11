@@ -8,12 +8,19 @@ from Scenes.Battle.data.jobs_config import JOBS
 from Scenes.UI.hud import StatusHUD
 
 class WorldScene:
-    def __init__(self, screen, manager, job_name, map_name="testmap.tmx", spawn_pos=None, debug_collision=False):
+    def __init__(self, screen, manager, job_name, map_name="testmap.tmx", spawn_pos=None, debug_collision=False, initial_stats=None):
         self.screen = screen
         self.manager = manager
         self.job_name = job_name
         self.map_name = map_name
         screen_width, screen_height = screen.get_size()
+        
+        # 提取初始属性
+        istats = initial_stats or {}
+        hp = istats.get("hp")
+        mp = istats.get("mp")
+        level = istats.get("level", 1)
+        exp = istats.get("exp", 0)
 
         # 1. 计算路径并加载地图
         base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
@@ -27,7 +34,8 @@ class WorldScene:
         else:
             actual_spawn = self.tiled_map.get_player_spawn_point() or (0,0)
         
-        self.player = Player(actual_spawn[0], actual_spawn[1], job_name)
+        self.player = Player(actual_spawn[0], actual_spawn[1], job_name, hp=hp, mp=mp, level=level, exp=exp)
+
         self.map_surface = self.tiled_map.make_map()
         
         # 3. 初始化 HUD
@@ -169,7 +177,7 @@ class WorldScene:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "MENU"
-            if event.key == pygame.K_SPACE or event.key == pygame.K_b:
+            if event.key == pygame.K_b:
                 return "BATTLE"
             if event.key == pygame.K_p:
                 return "SAVE"

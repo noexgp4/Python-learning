@@ -7,7 +7,7 @@ from Assets.Map.map import TiledMap
 class Player:
     # 初始化玩家
 
-    def __init__(self, x, y, job_name):
+    def __init__(self, x, y, job_name, hp=None, mp=None, level=1, exp=0):
         self.x = float(x)
         self.y = float(y)
 
@@ -29,8 +29,12 @@ class Player:
         self.is_running = False # 新增：加速状态
 
         # 属性状态
-        self.hp = self.max_hp = self.job_data.get("hp", 100)
-        self.mp = self.max_mp = self.job_data.get("mp", 50)
+        self.max_hp = self.job_data.get("hp", 100)
+        self.max_mp = self.job_data.get("mp", 50)
+        self.hp = hp if hp is not None else self.max_hp
+        self.mp = mp if mp is not None else self.max_mp
+        self.level = level
+        self.exp = exp
 
     def _cut_spritesheet(self):
         """

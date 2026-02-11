@@ -31,6 +31,31 @@ class GameState:
         # 物品/装备
         self.inventory = [] 
         
+    def gain_exp(self, amount):
+        """增加经验并处理升级逻辑"""
+        from Scenes.Battle.data.level_config import get_required_exp
+        self.exp += amount
+        
+        leveled_up = False
+        while True:
+            req_exp = get_required_exp(self.level)
+            if self.exp >= req_exp:
+                self.exp -= req_exp
+                self.level += 1
+                leveled_up = True
+                
+                # 升级时的数值成长 (简单演示，可以根据职业配置)
+                self.max_hp += 20
+                self.player_hp = self.max_hp
+                self.max_mp += 10
+                self.player_mp = self.max_mp
+                self.attack += 2
+                self.defense += 1
+                print(f"【升级】等级提升至 {self.level}!")
+            else:
+                break
+        return leveled_up
+
     def to_dict(self):
         """序列化为字典"""
         return {
@@ -68,9 +93,10 @@ class GameState:
         self.m_attack = data.get("m_attack", 0)
         self.defense = data.get("defense", 5)
         self.spd = data.get("spd", 10)
-        self.current_scene = data.get("current_scene", "Battle")
+        self.current_scene = data.get("current_scene", "WORLD")
         self.current_map = data.get("current_map", "testmap.tmx")
         self.player_x = data.get("player_x")
         self.player_y = data.get("player_y")
         self.unlocked_stages = data.get("unlocked_stages", [1])
         self.inventory = data.get("inventory", [])
+

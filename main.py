@@ -237,11 +237,27 @@ def main():
                         if res == "MENU":
                             current_state = "MENU"
                         elif res == "BATTLE":
+                            # 先将世界地图的玩家属性同步回存档对象
+                            if current_game_state and scene_manager.current_scene and hasattr(scene_manager.current_scene, 'player'):
+                                p = scene_manager.current_scene.player
+                                current_game_state.player_hp = p.hp
+                                current_game_state.player_mp = p.mp
+                                current_game_state.level = p.level
+                                current_game_state.exp = p.exp
+                                current_game_state.max_hp = p.max_hp
+                                current_game_state.max_mp = p.max_mp
+
                             job_key = current_game_state.job_name if current_game_state else "学生"
                             player_ent = Entity.from_job(job_key)
                             if player_ent and current_game_state:
                                 player_ent.hp = current_game_state.player_hp
+                                player_ent.max_hp = current_game_state.max_hp
                                 player_ent.mp = current_game_state.player_mp
+                                player_ent.max_mp = current_game_state.max_mp
+                                player_ent.atk = current_game_state.attack
+                                player_ent.m_atk = current_game_state.m_attack
+                                player_ent.def_val = current_game_state.defense
+                                player_ent.spd = current_game_state.spd
                             enemy_ent = Entity.from_monster("Slime_Green")
                             battle_scene = BattleScene(screen, player_ent, enemy_ent)
                             current_state = "BATTLE"
@@ -264,9 +280,31 @@ def main():
                         if res == "WORLD":
                             current_state = "WORLD"
                             # 同步战斗后的属性到存档对象
-                            if current_game_state:
+                            if current_game_state and battle_scene.system:
                                 current_game_state.player_hp = battle_scene.system.player.hp
                                 current_game_state.player_mp = battle_scene.system.player.mp
+                                
+                                # 如果战斗胜利，增加经验值和金币
+                                if battle_scene.system.state == "WIN":
+                                    total_exp = getattr(battle_scene.system, "total_exp", 0)
+                                    total_gold = getattr(battle_scene.system, "total_gold", 0)
+                                    current_game_state.gain_exp(total_exp)
+                                    current_game_state.gold += total_gold
+                                    # 额外同步升级后的上限
+                                    current_game_state.max_hp = battle_scene.system.player.max_hp
+                                    current_game_state.max_mp = battle_scene.system.player.max_mp
+                                    print(f"【结算】获得 {total_exp} EXP 和 {total_gold} Gold")
+                                
+                                # --- 核心修复：同步到世界地图的 Player 对象，让 HUD 实时更新 ---
+                                if world_scene and hasattr(world_scene, 'player'):
+                                    world_scene.player.hp = current_game_state.player_hp
+                                    world_scene.player.mp = current_game_state.player_mp
+                                    world_scene.player.level = current_game_state.level
+                                    world_scene.player.exp = current_game_state.exp
+                                    world_scene.player.max_hp = current_game_state.max_hp
+                                    world_scene.player.max_mp = current_game_state.max_mp
+
+
 
         # 1.5 逻辑更新逻辑 (移出事件循环，确保每帧只执行一次)
         if current_state == "WORLD":
@@ -279,6 +317,16 @@ def main():
                         current_game_state.player_y = update_data["pos"][1]
                         start_loading("WORLD")
                 elif update_res == "BATTLE":
+                    # 同步世界地图玩家属性到存档对象
+                    if current_game_state and scene_manager.current_scene and hasattr(scene_manager.current_scene, 'player'):
+                        p = scene_manager.current_scene.player
+                        current_game_state.player_hp = p.hp
+                        current_game_state.player_mp = p.mp
+                        current_game_state.level = p.level
+                        current_game_state.exp = p.exp
+                        current_game_state.max_hp = p.max_hp
+                        current_game_state.max_mp = p.max_mp
+
                     group_id = update_data.get("enemy_group")
                     group_data = ENEMY_GROUPS.get(group_id)
                     
@@ -296,7 +344,13 @@ def main():
                         player_ent = Entity.from_job(job_key)
                         if player_ent and current_game_state:
                             player_ent.hp = current_game_state.player_hp
+                            player_ent.max_hp = current_game_state.max_hp
                             player_ent.mp = current_game_state.player_mp
+                            player_ent.max_mp = current_game_state.max_mp
+                            player_ent.atk = current_game_state.attack
+                            player_ent.m_atk = current_game_state.m_attack
+                            player_ent.def_val = current_game_state.defense
+                            player_ent.spd = current_game_state.spd
                         
                         # 2. 【改进】加载群组中定义的所有怪物实体
                         enemy_entities = []
@@ -333,7 +387,15 @@ def main():
                     
                     map_name = current_game_state.current_map if current_game_state else "testmap.tmx"
                     
-                    world_scene = WorldScene(screen, scene_manager, job_name, map_name=map_name, spawn_pos=spawn_pos)
+                    # 获取存好的属性
+                    initial_stats = {
+                        "hp": current_game_state.player_hp if current_game_state else None,
+                        "mp": current_game_state.player_mp if current_game_state else None,
+                        "level": current_game_state.level if current_game_state else 1,
+                        "exp": current_game_state.exp if current_game_state else 0
+                    }
+                    
+                    world_scene = WorldScene(screen, scene_manager, job_name, map_name=map_name, spawn_pos=spawn_pos, initial_stats=initial_stats)
                     scene_manager.switch_scene(world_scene) # 同步到管理器中
                 elif current_state == "BATTLE":
                     # 可以在这里初始化，但我们目前在事件中手动初始化了

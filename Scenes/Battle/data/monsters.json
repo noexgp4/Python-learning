@@ -1,10 +1,14 @@
 {
     "Slime_Green": {
         "name": "绿史莱姆",
-        "hp": 600,
+        "hp": 100,
         "mp": 0,
         "atk": 12,
         "def": 5,
+        "exp_min": 10,
+        "exp_max": 20,
+        "gold_min": 10,
+        "gold_max": 20,
         "skills": [
             "basic_slash"
         ],
@@ -17,10 +21,14 @@
         "mp": 100,
         "atk": 5,
         "def": 2,
-        "ai": "cautious",
+        "exp_min": 10,
+        "exp_max": 20,
+        "gold_min": 10,
+        "gold_max": 20,
         "skills": [
             "shadow_bolt"
         ],
+        "ai": "cautious",
         "image_key": "skeleton_mage"
     }
 }
