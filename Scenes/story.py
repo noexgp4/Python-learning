@@ -22,14 +22,9 @@ class StoryScene:
         self.display_char_count = 0  
 
     def _load_json_data(self, filename, key):
-        """合并数据加载逻辑"""
-        try:
-            path = os.path.join(os.path.dirname(__file__), filename)
-            with open(path, "r", encoding="utf-8") as f:
-                return json.load(f).get(key, [])
-        except Exception as e:
-            print(f"加载{filename}失败: {e}")
-            return ["故事开始于迷雾之中...", "勇者 {job} 踏上了旅程。"]
+        """从 DataManager 获取剧情数据"""
+        from Scenes.DataManager import data_manager
+        return data_manager.story.get(key, ["故事开始于迷雾之中...", "勇者 {job} 踏上了旅程。"])
 
     def _load_assets(self, base_path, names):
         """合并资源加载逻辑，减少 try-except 碎块"""

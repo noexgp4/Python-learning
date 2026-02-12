@@ -3,6 +3,8 @@
         "name_key": "sniper_name",
         "desc_key": "sniper_desc",
         "initial_stats": {
+            "weapon": "beginner_musketeer",
+            "armor": "cloth_tunic",
             "hp": 100,
             "mp": 10,
             "atk": 25,
@@ -20,8 +22,9 @@
         },
         "avatar_path": "Assets/Image/Characters/Thinker.png",
         "skills": [
+            "shotgun",
             "aim",
-            "shotgun"
+            "Loading"
         ],
         "sprite_path": "Assets/Image/Characters/character.png",
         "sprite_index": 0,
@@ -36,6 +39,8 @@
         "name_key": "warrior_name",
         "desc_key": "warrior_desc",
         "initial_stats": {
+            "weapon": "rusty_iron_sword",
+            "armor": "leather_armor",
             "hp": 200,
             "mp": 50,
             "atk": 25,
@@ -69,6 +74,8 @@
         "name_key": "thinker_name",
         "desc_key": "thinker_desc",
         "initial_stats": {
+            "weapon": "rusty_iron_sword",
+            "armor": "leather_armor",
             "hp": 150,
             "mp": 100,
             "atk": 10,
@@ -102,6 +109,8 @@
         "name_key": "mage_name",
         "desc_key": "mage_desc",
         "initial_stats": {
+            "weapon": "rusty_iron_sword",
+            "armor": "leather_armor",
             "hp": 100,
             "mp": 180,
             "atk": 5,

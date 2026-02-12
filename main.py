@@ -1,6 +1,11 @@
 import pygame
 import sys
 import random
+
+from Scenes.DataManager import data_manager
+# --- 优先初始化数据管理器 ---
+data_manager.load_all()
+
 from Scenes.menu import MainMenu
 from Scenes.settings import SettingsScene
 from Core.audio import AudioManager
@@ -17,6 +22,7 @@ from Scenes.Battle.models.entity import Entity
 from Language.language_manager import LanguageManager
 from Scenes.Battle.data.monsters_config import MONSTERS_DATA, ENEMY_GROUPS
 from Assets.Map.SceneManager import SceneManager
+from Scenes.CharacterMenuScene import CharacterMenuScene
 
 # --- 初始化 Pygame ---
 pygame.init()
@@ -53,6 +59,7 @@ show_confirm_dialog = False
 confirm_selected_index = 0
 is_new_game = False
 current_slot_id = None  # 记录当前正在使用的存档槽位
+character_menu_scene = None
 
 # --- 加载页专用变量 ---
 loading_progress = 0
@@ -75,7 +82,7 @@ def start_loading(target_state):
     current_state = "LOADING"
 
 def main():
-    global current_state, show_confirm_dialog, story_scene, current_game_state, screen, confirm_selected_index, is_new_game, loading_progress, current_slot_id, world_scene, battle_scene
+    global current_state, show_confirm_dialog, story_scene, current_game_state, screen, confirm_selected_index, is_new_game, loading_progress, current_slot_id, world_scene, battle_scene, character_menu_scene
     
     while True:
         dt = clock.tick(60) / 1000.0
@@ -233,9 +240,12 @@ def main():
                 # --- 世界地图：仅处理按键事件，不更新逻辑 ---
                 elif current_state == "WORLD":
                     if scene_manager.current_scene:
-                        res = scene_manager.current_scene.handle_events(event)
+                        res, extra = scene_manager.current_scene.handle_events(event)
                         if res == "MENU":
                             current_state = "MENU"
+                        elif res == "CHARACTER_MENU":
+                            character_menu_scene = CharacterMenuScene(screen, current_game_state, scene_manager.current_scene.player, initial_tab=extra)
+                            current_state = "CHARACTER_MENU"
                         elif res == "BATTLE":
                             # 先将世界地图的玩家属性同步回存档对象
                             if current_game_state and scene_manager.current_scene and hasattr(scene_manager.current_scene, 'player'):
@@ -278,6 +288,21 @@ def main():
                     if battle_scene:
                         res = battle_scene.handle_input(event)
                         if res == "WORLD":
+                            # 如果战败，尝试回档
+                            if battle_scene.system.state == "LOSS":
+                                if current_slot_id is not None:
+                                    print(f"【战败】正在加载存档槽位: {current_slot_id}")
+                                    loaded_state = save_scene.load_game(current_slot_id)
+                                    if loaded_state:
+                                        current_game_state = loaded_state
+                                        start_loading("WORLD")
+                                        continue
+                                
+                                # 没档或回档失败则回菜单
+                                current_state = "MENU"
+                                continue
+
+                            # 胜利或撤退的情况
                             current_state = "WORLD"
                             # 同步战斗后的属性到存档对象
                             if current_game_state and battle_scene.system:
@@ -303,6 +328,13 @@ def main():
                                     world_scene.player.exp = current_game_state.exp
                                     world_scene.player.max_hp = current_game_state.max_hp
                                     world_scene.player.max_mp = current_game_state.max_mp
+
+                # --- 角色菜单界面 ---
+                elif current_state == "CHARACTER_MENU":
+                    if character_menu_scene:
+                        res = character_menu_scene.handle_input(event)
+                        if res == "WORLD":
+                            current_state = "WORLD"
 
 
 
@@ -458,6 +490,11 @@ def main():
                 screen.fill((50, 50, 100))
                 title = UIConfig.render_text("正在进入世界...", type="title")
                 UIConfig.draw_center_text(screen, title, 250)
+        elif current_state == "CHARACTER_MENU":
+            if scene_manager.current_scene:
+                 scene_manager.current_scene.draw()
+            if character_menu_scene:
+                character_menu_scene.draw()
         
         elif current_state == "BATTLE":
             if battle_scene:

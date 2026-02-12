@@ -17,15 +17,15 @@ class AudioManager:
 
     def load_config(self):
         """加载音频配置"""
-        if os.path.exists(self.config_file):
-            try:
-                with open(self.config_file, 'r', encoding='utf-8') as f:
-                    import json
-                    data = json.load(f)
-                    self.bgm_volume = max(0.0, min(1.0, data.get("bgm_volume", 0.5)))
-                    self.sfx_volume = max(0.0, min(1.0, data.get("sfx_volume", 0.5)))
-            except Exception as e:
-                print(f"音频管理器加载配置失败: {e}")
+        from Scenes.DataManager import data_manager
+        
+        # 直接从全局 DataManager 获取配置
+        data = data_manager.config
+        if data:
+            self.bgm_volume = max(0.0, min(1.0, data.get("bgm_volume", 0.5)))
+            self.sfx_volume = max(0.0, min(1.0, data.get("sfx_volume", 0.5)))
+        else:
+            print("音频管理器: DataManager 未包含配置，使用默认值")
 
     def load_resources(self):
         """加载所有音频资源"""

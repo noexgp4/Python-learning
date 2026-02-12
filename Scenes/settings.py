@@ -54,36 +54,27 @@ class SettingsScene:
         self.ui_manager = UIManager(self.screen)
 
     def load_config(self):
-        """从文件读取音量和显示设置"""
-        print(f"尝试从 {self.config_file} 加载配置...")
-        print(f"配置文件存在: {os.path.exists(self.config_file)}")
+        """从 DataManager 读取音量和显示设置"""
+        from Scenes.DataManager import data_manager
+        print(f"尝试从 DataManager 加载配置...")
         
-        if os.path.exists(self.config_file):
-            try:
-                with open(self.config_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # 加载音量
-                    self.bgm_volume = max(0.0, min(1.0, data.get("bgm_volume", 0.5)))
-                    self.sfx_volume = max(0.0, min(1.0, data.get("sfx_volume", 0.5)))
-                    self.audio_manager.set_bgm_volume(self.bgm_volume)
-                    self.audio_manager.set_sfx_volume(self.sfx_volume)
-                    # 加载分辨率
-                    self.resolution_index = data.get("resolution_index", 0)
-                    self.is_fullscreen = data.get("is_fullscreen", False)
-                    # 加载语言
-                    self.current_language = data.get("language", "zh")
-                    self.language_manager.change_language(self.current_language)
-                    
-                    print(f"[OK] 从 {self.config_file} 加载配置成功")
-                    print(f"  背景音乐音量: {int(self.bgm_volume*100)}%")
-                    print(f"  音效音量: {int(self.sfx_volume*100)}%")
-                    print(f"  分辨率: {self.RESOLUTIONS[self.resolution_index]}")
-                    print(f"  全屏模式: {'是' if self.is_fullscreen else '否'}")
-            except Exception as e:
-                print(f"[ERROR] 加载配置失败: {e}，使用默认值")
-                self._set_defaults()
+        data = data_manager.config
+        if data:
+            # 加载音量
+            self.bgm_volume = max(0.0, min(1.0, data.get("bgm_volume", 0.5)))
+            self.sfx_volume = max(0.0, min(1.0, data.get("sfx_volume", 0.5)))
+            self.audio_manager.set_bgm_volume(self.bgm_volume)
+            self.audio_manager.set_sfx_volume(self.sfx_volume)
+            # 加载分辨率
+            self.resolution_index = data.get("resolution_index", 0)
+            self.is_fullscreen = data.get("is_fullscreen", False)
+            # 加载语言
+            self.current_language = data.get("language", "zh")
+            self.language_manager.change_language(self.current_language)
+            
+            print(f"[OK] 从 DataManager 加载配置成功")
         else:
-            print(f"[INFO] 配置文件不存在，将在 {self.config_file} 创建")
+            print(f"[INFO] DataManager 配置为空，使用默认值")
             self._set_defaults()
         
         # 进入设置界面时，从当前值初始化临时值
@@ -131,7 +122,12 @@ class SettingsScene:
             
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
-            print(f"[OK] 配置已保存到 {self.config_file}")
+            
+            # 通知 DataManager 重新加载数据（特别是语言配置）
+            from Scenes.DataManager import data_manager
+            data_manager.load_all(self.current_language)
+
+            print(f"[OK] 配置已保存并更新 DataManager")
             print(f"  背景音乐: {int(self.bgm_volume*100)}%, 音效: {int(self.sfx_volume*100)}%")
             print(f"  分辨率: {self.RESOLUTIONS[self.resolution_index]}, 全屏: {self.is_fullscreen}")
             return True

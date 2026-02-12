@@ -178,7 +178,11 @@ class WorldScene:
             if event.key == pygame.K_ESCAPE:
                 return "MENU"
             if event.key == pygame.K_b:
-                return "BATTLE"
+                return "CHARACTER_MENU", "INVENTORY"
+            if event.key == pygame.K_i:
+                return "CHARACTER_MENU", "STATS"
+            if event.key == pygame.K_k:
+                return "CHARACTER_MENU", "SKILLS"
             if event.key == pygame.K_p:
                 return "SAVE"
-        return None
+        return None, None
