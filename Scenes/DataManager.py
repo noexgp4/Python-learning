@@ -21,6 +21,9 @@ class DataManager:
         self.config = {}
         self.story = {}
         self.texts = {}
+        self.chests = {}
+        self.shops = {}
+        self.npcs = {}
         self._initialized = True
 
     def load_all(self, lang=None):
@@ -82,6 +85,17 @@ class DataManager:
         self.texts.clear()
         self.texts.update(self._load_json(os.path.join(lang_dir, f"{lang}.json")))
 
+        # 6. 地图对象数据 (宝箱、商店)
+        map_dir = os.path.join(base_dir, "Assets", "Map")
+        self.chests.clear()
+        self.chests.update(self._load_json(os.path.join(map_dir, "chests.json")))
+        
+        self.shops.clear()
+        self.shops.update(self._load_json(os.path.join(map_dir, "shops.json")))
+
+        self.npcs.clear()
+        self.npcs.update(self._load_json(os.path.join(map_dir, "npcs.json")))
+
         print(f"--- 游戏数据库初始化完成 (语言: {lang}) ---")
 
     def _load_json(self, path):
@@ -105,6 +119,15 @@ class DataManager:
 
     def get_text(self, category, key):
         return self.texts.get(category, {}).get(key, f"NO_TEXT: {category}.{key}")
+
+    def get_chest_data(self, chest_id):
+        return self.chests.get(chest_id)
+
+    def get_shop_data(self, shop_id):
+        return self.shops.get(shop_id)
+
+    def get_npc_data(self, npc_id):
+        return self.npcs.get(npc_id)
 
 # 导出全局单例
 data_manager = DataManager()

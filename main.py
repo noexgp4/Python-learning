@@ -282,6 +282,12 @@ def main():
                                     current_game_state.current_map = getattr(scene, 'map_name', 'testmap.tmx')
                             save_scene.refresh_slots()
                             current_state = "SAVE_SELECT"
+                        elif res == "CHEST_OPEN":
+                            if current_game_state:
+                                item_id = extra.get("item_id")
+                                if item_id:
+                                    current_game_state.inventory.append(item_id)
+                                    print(f"【系统】获得物品: {item_id} 已加入背包 (事件触发)")
 
                 # --- 战斗界面：处理输入 ---
                 elif current_state == "BATTLE":

@@ -1,7 +1,9 @@
 {
-    "map_01_chest_01": {
-        "item_id": "iron_sword",
+    "village_01_c1": {
+        "item_id": "beginner_musketeer",
         "gold": 50,
+        "sprite_closed": "Treasure Chest.png",
+        "sprite_opened": "openchest.png",
         "is_opened": false
     }
 }

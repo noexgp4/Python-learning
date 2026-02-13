@@ -205,9 +205,9 @@ class CharacterMenuScene:
             self.ui_manager.add_component(Label(equip_x + 15, y + 65, attr_text, "small", UIConfig.COLOR_GRAY_LIGHT))
 
     def _draw_inventory(self):
-        # 背包网格建议 4x4 或 5x5
-        cols = 5
-        slot_size = 80
+        # 背包网格 4x4 展示，给长名字留出空间
+        cols = 4
+        slot_size = 110
         spacing = 20
         
         inventory = self.game_state.inventory
@@ -217,16 +217,30 @@ class CharacterMenuScene:
             x = self.content_x + col * (slot_size + spacing)
             y = self.content_y + row * (slot_size + spacing)
             
+            # 绘制格子背景
             self.ui_manager.add_component(Panel(x, y, slot_size, slot_size, (45, 45, 45, 255), (100, 100, 100), 1, 8))
             
             if i < len(inventory):
-                item = inventory[i]
-                # 这里可以根据物品 ID 显示图标或名字缩写
-                item_name = str(item)[:4]
-                self.ui_manager.add_component(Label(x + 5, y + 25, item_name, "small", UIConfig.COLOR_WHITE))
+                item_id = inventory[i]
+                display_name = self._get_item_name(item_id)
+                
+                # 文字居中处理
+                tw = UIConfig.SMALL_FONT.size(display_name)[0]
+                tx = x + (slot_size - tw) // 2
+                ty = y + (slot_size - 20) // 2
+                
+                self.ui_manager.add_component(Label(tx, ty, display_name, "small", UIConfig.COLOR_WHITE))
         
         if not inventory:
             self.ui_manager.add_component(Label(self.content_x, self.content_y + 100, "背包里空空如也...", "normal", UIConfig.COLOR_GRAY))
+
+    def _get_item_name(self, item_id):
+        """从装备库查找物品显示名称"""
+        for cat in ["weapons", "armors"]:
+            item_data = data_manager.equips.get(cat, {}).get(item_id)
+            if item_data:
+                return item_data.get("name", item_id)
+        return str(item_id)
 
     def _draw_skills(self):
         # 获取职业技能

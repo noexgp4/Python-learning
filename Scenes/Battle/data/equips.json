@@ -4,6 +4,7 @@
             "name": "新手火枪",
             "atk": 15,
             "weight": 5,
+            "item_id": "beginner_musketeer",
             "description": "虽然生锈了，但依然锋利。",
             "price": 100
         },
@@ -11,6 +12,7 @@
             "name": "铁剑",
             "atk": 15,
             "weight": 5,
+            "item_id": "rusty_iron_sword",
             "description": "虽然生锈了，但依然锋利。",
             "price": 100
         },
@@ -18,6 +20,7 @@
             "name": "魔法学徒权杖",
             "atk": 5,
             "mp_max": 30,
+            "item_id": "magic_staff",
             "description": "顶端的宝石闪烁着微光。",
             "price": 250
         }
@@ -27,12 +30,14 @@
             "name": "布衣",
             "def": 5,
             "spd": 2,
+            "item_id": "cloth_tunic",
             "description": "轻便且耐穿。",
             "price": 150
         },
         "leather_armor": {
             "name": "皮甲",
             "def": 8,
+            "item_id": "leather_armor",
             "spd": 2,
             "description": "轻便且耐穿。",
             "price": 150

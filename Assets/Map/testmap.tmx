@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="39" nextobjectid="36">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="43" nextobjectid="37">
  <tileset firstgid="1" source="Building.tsx"/>
  <tileset firstgid="69" source="terrain.tsx"/>
  <tileset firstgid="286" source="MyDecorations.tsx"/>
@@ -21,8 +21,9 @@
    <image source="../Tiles/Decorative items/Tiles (11).png" width="32" height="32"/>
   </tile>
  </tileset>
- <layer id="36" name="圖塊層 2" width="32" height="32">
-  <data encoding="csv">
+ <group id="41" name="Group 1">
+  <layer id="36" name="圖塊層 2" width="32" height="32">
+   <data encoding="csv">
 264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,
 264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,
 264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,
@@ -56,9 +57,9 @@
 264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,
 264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264,264
 </data>
- </layer>
- <layer id="31" name="圖塊層 3" width="32" height="32">
-  <data encoding="csv">
+  </layer>
+  <layer id="31" name="圖塊層 3" width="32" height="32">
+   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,299,299,299,299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -92,9 +93,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
- </layer>
- <layer id="37" name="圖塊層 4" width="32" height="32">
-  <data encoding="csv">
+  </layer>
+  <layer id="37" name="圖塊層 4" width="32" height="32">
+   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -128,7 +129,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
- </layer>
+  </layer>
+ </group>
  <objectgroup id="30" name="EncounterAreas">
   <object id="30" x="1.33333" y="332.667" width="704.667" height="114.666">
    <properties>
@@ -166,10 +168,18 @@
   <object id="29" x="992" y="256" width="32.5834" height="89.3826"/>
  </objectgroup>
  <objectgroup id="38" name="Chest">
-  <object id="35" class="chest" x="96" y="128" width="31.8312" height="32.25">
+  <object id="35" type="chest" x="96" y="128" width="31.8312" height="32.25">
    <properties>
     <property name="chest_id" value="village_01_c1"/>
-    <property name="item_id" value="iron_sword"/>
+    <property name="item_id" value="beginner_musketeer"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="39" name="Shop">
+  <object id="36" type="npc_shop" x="416" y="224" width="32" height="32">
+   <properties>
+    <property name="npc_sprite" value="old_man_02"/>
+    <property name="shop_id" value="village_weapon_shop"/>
    </properties>
   </object>
  </objectgroup>

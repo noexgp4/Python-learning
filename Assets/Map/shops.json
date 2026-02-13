@@ -1,15 +1,18 @@
 {
     "village_weapon_shop": {
-        "name": "新手村铁匠铺",
+        "name": "新手村商店",
+        "shop_id": "village_weapon_shop",
+        "sprite": "house (7).png",
         "inventory": [
-            "iron_sword",
+            "beginner_musketeer",
             "leather_armor",
-            "wooden_shield"
+            "cloth_tunic"
         ],
         "discounts": 1.0
     },
     "magic_tower_shop": {
         "name": "法师塔商店",
+        "sprite": "house (7).png",
         "inventory": [
             "magic_staff",
             "book_fireball"

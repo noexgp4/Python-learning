@@ -7,7 +7,8 @@ from Assets.Map.camera import Camera
 from Scenes.Battle.data.loader import Player
 from Scenes.Battle.data.jobs_config import JOBS
 from Scenes.UI.hud import StatusHUD
-from Assets.Map.Chest import Chest
+from Scenes.DataManager import data_manager
+from Scenes.text import UIConfig, Panel, Label
 
 class WorldScene:
     def __init__(self, screen, manager, job_name, map_name="testmap.tmx", spawn_pos=None, debug_collision=False, initial_stats=None):
@@ -28,26 +29,7 @@ class WorldScene:
         base_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
         map_path = os.path.join(base_dir, "Assets", "Map", map_name)
         self.tiled_map = TiledMap(map_path)
-        print(f"【地图】加载了 {map_name}, 包含 {len(self.tiled_map.walls)} 个碰撞墙, {len(self.tiled_map.portals)} 个传送点, {len(self.tiled_map.encounter_areas)} 个遇怪区")
-       
-        self.chest_group = pygame.sprite.Group()
-        for obj in self.tiled_map.tmx_data.objects:
-            props = getattr(obj, 'properties', {})
-            # 检查 chest_id, class, type 或 name
-            is_chest = ("chest_id" in props or 
-                        "chest" in str(getattr(obj, 'class', '')).lower() or 
-                        "chest" in str(getattr(obj, 'class_', '')).lower() or 
-                        "chest" in str(getattr(obj, 'type', '')).lower() or
-                        "chest" in str(getattr(obj, 'name', '')).lower())
-            
-            if is_chest:
-                item_id = props.get("item_id", "default_gold")
-                new_chest = Chest(obj.x, obj.y, item_id)
-                self.chest_group.add(new_chest)
-                # 核心：将宝箱的碰撞区域加入地图碰撞列表
-                self.tiled_map.walls.append(new_chest.rect)
-                print(f"【DEBUG】加载带碰撞宝箱: {item_id} at ({obj.x}, {obj.y})")
-        print(f"【地图】加载了 {len(self.chest_group)} 个宝箱，已注入碰撞墙")
+        print(f"【地图】加载了 {map_name}, 包含 {len(self.tiled_map.walls)} 个碰撞墙, {len(self.tiled_map.portals)} 个传送点, {len(self.tiled_map.world_objects)} 个可交互物体")
         
         # 2. 确定出生点
         if spawn_pos:
@@ -74,6 +56,10 @@ class WorldScene:
         self.debug_collision = debug_collision
         self.movement_accumulator = 0 # 遇怪步数累加器
         self.teleport_cooldown = 1.0  # 初始 1 秒传送冷却，防止循环传送
+        
+        # 掉落提示框状态
+        self.showing_loot = False
+        self.loot_item_name = ""
 
     def update(self, dt):
         # 1. 保存移动前的坐标
@@ -199,29 +185,59 @@ class WorldScene:
             draw_img = pygame.transform.scale(player_img, (int(player_screen_w), int(player_screen_h)))
             screen.blit(draw_img, (player_screen_x, player_screen_y))
         
-        # 5. 绘制宝箱
-        for chest in self.chest_group:
-            chest_screen_x = (chest.rect.x + offset_x) * zoom
-            chest_screen_y = (chest.rect.y + offset_y) * zoom
-            # 强化绘制逻辑：确保使用正确的高宽
-            img_w, img_h = chest.image.get_size()
-            chest_w = img_w * zoom
-            chest_h = img_h * zoom
+        # 5. 绘制可交互物体 (宝箱、NPC等)
+        for obj in self.tiled_map.world_objects:
+            obj_screen_x = (obj.rect.x + offset_x) * zoom
+            obj_screen_y = (obj.rect.y + offset_y) * zoom
             
-            # 调试用的底色矩形，确保哪怕图片是透明的也能看到位置
-            # debug_rect = pygame.Rect(chest_screen_x, chest_screen_y, chest_w, chest_h)
-            # pygame.draw.rect(screen, (255, 215, 0), debug_rect, 2) # 金色边框
-            
-            scaled_chest = pygame.transform.scale(chest.image, (int(chest_w), int(chest_h)))
-            screen.blit(scaled_chest, (chest_screen_x, chest_screen_y))
-            
-            if pygame.time.get_ticks() % 6000 < 20: 
-                print(f"【DEBUG】渲染宝箱: {chest.item_id}, 屏幕位置: ({int(chest_screen_x)}, {int(chest_screen_y)})")
+            if obj.image:
+                img_w, img_h = obj.image.get_size()
+                rect_h = obj.rect.height
+                
+                # 如果图片比占位符高（如房子、高大的NPC），向上偏移以保持底部对齐
+                if img_h > rect_h:
+                    obj_screen_y -= (img_h - rect_h) * zoom
+                
+                scaled_img = pygame.transform.scale(obj.image, (int(img_w * zoom), int(img_h * zoom)))
+                screen.blit(scaled_img, (obj_screen_x, obj_screen_y))
+            elif self.debug_collision:
+                # 调试模式下为没有图片的物体画个框
+                pygame.draw.rect(screen, (0, 255, 255), (obj_screen_x, obj_screen_y, obj.rect.width * zoom, obj.rect.height * zoom), 1)
 
         # 6. 绘制 HUD
         self.hud.draw(screen)
 
+        # 7. 绘制获得物品对话框
+        if self.showing_loot:
+            self._draw_loot_dialog(screen)
+
+    def _draw_loot_dialog(self, screen):
+        dw, dh = 400, 150
+        dx = (screen.get_width() - dw) // 2
+        dy = (screen.get_height() - dh) // 2
+        
+        # 背景遮罩
+        overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 100))
+        screen.blit(overlay, (0, 0))
+        
+        # 对话框
+        Panel(dx, dy, dw, dh, (30, 30, 30, 255), UIConfig.COLOR_YELLOW, 2, 12).draw(screen)
+        
+        msg = f"获得物品: {self.loot_item_name}"
+        tw = UIConfig.NORMAL_FONT.size(msg)[0]
+        Label(dx + (dw - tw) // 2, dy + 40, msg, "normal", UIConfig.COLOR_WHITE).draw(screen)
+        
+        hint = "[Enter / Space] 确认"
+        hw = UIConfig.SMALL_FONT.size(hint)[0]
+        Label(dx + (dw - hw) // 2, dy + dh - 40, hint, "small", UIConfig.COLOR_GRAY).draw(screen)
+
     def handle_events(self, event):
+        if self.showing_loot:
+            if event.type == pygame.KEYDOWN and event.key in [pygame.K_RETURN, pygame.K_SPACE, pygame.K_e]:
+                self.showing_loot = False
+            return None, None
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "MENU"
@@ -234,14 +250,35 @@ class WorldScene:
             if event.key == pygame.K_p:
                 return "SAVE"
             
-            # 交互：宝箱
+            # 交互处理 (宝箱、商店、NPC)
             if event.key in [pygame.K_RETURN, pygame.K_SPACE, pygame.K_e]:
                 player_rect = self.player.get_rect()
-                # 稍微扩大一点判定范围
                 interact_rect = player_rect.inflate(20, 20)
-                for chest in self.chest_group:
-                    if interact_rect.colliderect(chest.rect) and chest.state == "closed":
-                        chest.open()
-                        print(f"【宝箱】开启！获得物品: {chest.item_id}")
-                        return "CHEST_OPEN", {"item_id": chest.item_id}
+                
+                for obj in self.tiled_map.world_objects:
+                    if interact_rect.colliderect(obj.rect):
+                        res, data = obj.interact()
+                        if res == "CHEST_OPEN":
+                            item_id = data.get("item_id")
+                            item_name = self._get_item_display_name(item_id)
+                            self.showing_loot = True
+                            self.loot_item_name = item_name
+                            return "CHEST_OPEN", data
+                        elif res == "SHOP_OPEN":
+                            print(f"【系统】打开商店: {data.get('shop_id')}")
+                            return "SHOP_OPEN", data
+                        elif res == "NPC_TALK":
+                            name = data.get("name")
+                            dialogue = data.get("dialogue", ["..."])[0] # 取第一句
+                            self.showing_loot = True
+                            self.loot_item_name = f"{name}: {dialogue}"
+                            print(f"【对话】{name}: {dialogue}")
         return None, None
+
+    def _get_item_display_name(self, item_id):
+        # 遍历装备库查找名称
+        for cat in ["weapons", "armors"]:
+            item = data_manager.equips.get(cat, {}).get(item_id)
+            if item:
+                return item.get("name", item_id)
+        return item_id

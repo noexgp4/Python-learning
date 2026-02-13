@@ -1,5 +1,6 @@
 import pygame
 import pytmx
+from Assets.Map.world_objects import create_world_object
 
 class TiledMap:
     def __init__(self, filename):
@@ -12,6 +13,7 @@ class TiledMap:
         self.walls = [] 
         self.portals = []
         self.encounter_areas = [] 
+        self.world_objects = [] # 新增：可交互的实体对象 (宝箱、NPC等)
         self.objects_by_name = {} # 新增：按名字索引所有对象
         
         for layer in self.tmx_data.layers:
@@ -77,6 +79,13 @@ class TiledMap:
                         self.walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
                     elif hasattr(obj, 'gid') and obj.gid:
                         self._add_tile_collision(obj.x, obj.y, obj.gid)
+
+                    # 4. 可交互物体判定 (工厂模式)
+                    world_obj = create_world_object(obj)
+                    if world_obj:
+                        self.world_objects.append(world_obj)
+                        # 默认为交互物体增加碰撞
+                        self.walls.append(world_obj.rect)
 
     def get_object_by_name(self, name):
         """按名称检索任意对象"""
