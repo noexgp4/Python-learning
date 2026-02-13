@@ -5,21 +5,23 @@ class GameState:
         self.job_name = job_name
         
         # 获取职业配置
-        config = CLASSES.get(job_name, {"hp": 100, "atk": 10, "def": 5, "spd": 10})
+        config = CLASSES.get(job_name, {})
+        init_stats = config.get("initial_stats", {})
         
-        self.player_hp = config.get("hp", 100)
-        self.max_hp = config.get("hp", 100)
-        self.player_mp = config.get("mp", 50)
-        self.max_mp = config.get("mp", 50)
+        # 如果 initial_stats 存在，优先从中读取，否则尝试从顶级或默认值读取
+        self.player_hp = init_stats.get("hp", config.get("hp", 100))
+        self.max_hp = self.player_hp
+        self.player_mp = init_stats.get("mp", config.get("mp", 50))
+        self.max_mp = self.player_mp
         self.level = 1
         self.exp = 0
         self.gold = 0
-        self.m_attack = config.get("m_atk", 0)
+        self.m_attack = init_stats.get("m_atk", config.get("m_atk", 0))
         
         # 战斗属性
-        self.attack = config.get("atk", 10)
-        self.defense = config.get("def", 5)
-        self.spd = config.get("spd", 10)
+        self.attack = init_stats.get("atk", config.get("atk", 10))
+        self.defense = init_stats.get("def", config.get("def", 5))
+        self.spd = init_stats.get("spd", config.get("spd", 10))
         
         # 进度记录
         self.current_scene = "STORY" 
@@ -28,8 +30,16 @@ class GameState:
         self.player_y = None
         self.unlocked_stages = [1]
         
+        # 记录每张地图的离开位置，用于“返回”逻辑
+        self.map_return_points = {}
+        
         # 物品/装备
         self.inventory = [] 
+        self.equipped = {
+            "weapon": init_stats.get("weapon"),
+            "armor": init_stats.get("armor"),
+            "head": init_stats.get("head")
+        }
         
     def gain_exp(self, amount):
         """增加经验并处理升级逻辑"""
@@ -76,7 +86,9 @@ class GameState:
             "player_x": self.player_x,
             "player_y": self.player_y,
             "unlocked_stages": self.unlocked_stages,
-            "inventory": self.inventory
+            "inventory": self.inventory,
+            "equipped": self.equipped,
+            "map_return_points": self.map_return_points
         }
     
     def load_from_dict(self, data):
@@ -99,4 +111,6 @@ class GameState:
         self.player_y = data.get("player_y")
         self.unlocked_stages = data.get("unlocked_stages", [1])
         self.inventory = data.get("inventory", [])
+        self.equipped = data.get("equipped", {"weapon": None, "armor": None, "head": None})
+        self.map_return_points = data.get("map_return_points", {})
 

@@ -1,0 +1,19 @@
+{
+    "village_weapon_shop": {
+        "name": "新手村铁匠铺",
+        "inventory": [
+            "iron_sword",
+            "leather_armor",
+            "wooden_shield"
+        ],
+        "discounts": 1.0
+    },
+    "magic_tower_shop": {
+        "name": "法师塔商店",
+        "inventory": [
+            "magic_staff",
+            "book_fireball"
+        ],
+        "discounts": 0.8
+    }
+}

@@ -12,6 +12,8 @@ SKILLS_LIB = {
         "name": "狙击",
         "cost": 1,
         "power": 20,
+        "cooldown": 2,
+        "duration": 4,
         "desc": "瞄准单个目标,每回合增加100%暴击伤害，最多四回合，结束时造成暴击伤害"
     },
     "shotgun": {
@@ -19,14 +21,25 @@ SKILLS_LIB = {
         "name": "霰弹枪",
         "cost": 2,
         "power": 20,
+        "cooldown": 0,
         "desc": "射击目标弹射到后方玩家,消耗2子弹"
     },
     "Loading": {
         "id": "Loading",
-        "name": "装填",
+        "name": "装填",        
         "cost": 0,
         "power": 0,
+        "cooldown": 0,
         "desc": "装填子弹"
+    },
+    "Hawkeye": {
+        "id": "Hawkeye",
+        "name": "鹰眼",
+        "cost": 5,
+        "power": 0,
+        "cooldown": 3,
+        "duration": 3,
+        "desc": "进入鹰眼状态持续3回合,并可以查看到目标怪物的血量状态。"
     },
     "basic_slash": {
         **BASE_PHYSIC,

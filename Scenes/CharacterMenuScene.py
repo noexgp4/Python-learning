@@ -100,8 +100,9 @@ class CharacterMenuScene:
             self.ui_manager.add_component(ImageComponent(50, 70, self.avatar))
         
         # 名字和职业
-        name_text = f"{self.game_state.job_name}"
-        self.ui_manager.add_component(Label(40, 300, name_text, "title", UIConfig.COLOR_YELLOW))
+        job_data = data_manager.jobs.get(self.game_state.job_name, {})
+        display_name = job_data.get("name", self.game_state.job_name)
+        self.ui_manager.add_component(Label(40, 300, display_name, "title", UIConfig.COLOR_YELLOW))
         
         # 等级和经验
         lv_text = f"等级 {self.game_state.level}"
@@ -134,21 +135,74 @@ class CharacterMenuScene:
             self.ui_manager.add_component(Label(tx, 52, text, "small", color))
 
     def _draw_stats(self):
-        # 详细属性展示
+        # 1. 基础属性展示 (左侧)
         stats_list = [
             ("生命值", f"{self.game_state.player_hp} / {self.game_state.max_hp}", (255, 100, 100)),
             ("魔法值", f"{self.game_state.player_mp} / {self.game_state.max_mp}", (100, 150, 255)),
-            ("基础攻击", f"{self.game_state.attack}", UIConfig.COLOR_WHITE),
+            ("物理攻击", f"{self.game_state.attack}", UIConfig.COLOR_WHITE),
             ("魔法攻击", f"{self.game_state.m_attack}", UIConfig.COLOR_WHITE),
             ("物理防御", f"{self.game_state.defense}", UIConfig.COLOR_WHITE),
             ("移动速度", f"{self.game_state.spd}", UIConfig.COLOR_WHITE)
         ]
         
+        half_w = self.content_w // 2 - 10
+        item_h = 55
+        spacing = 12
+        
+        # 绘制左侧标题
+        self.ui_manager.add_component(Label(self.content_x, self.content_y - 40, "核心属性", "normal", UIConfig.COLOR_YELLOW))
+        
         for i, (label, val, color) in enumerate(stats_list):
-            y = self.content_y + i * 60
-            self.ui_manager.add_component(Panel(self.content_x, y, self.content_w, 50, (40, 40, 40, 255), border_radius=10))
-            self.ui_manager.add_component(Label(self.content_x + 20, y + 10, label, "normal", UIConfig.COLOR_GRAY_LIGHT))
-            self.ui_manager.add_component(Label(self.content_x + self.content_w - 150, y + 10, val, "normal", color))
+            y = self.content_y + i * (item_h + spacing)
+            self.ui_manager.add_component(Panel(self.content_x, y, half_w, item_h, (40, 40, 40, 255), border_radius=10))
+            self.ui_manager.add_component(Label(self.content_x + 15, y + 12, label, "small", UIConfig.COLOR_GRAY_LIGHT))
+            self.ui_manager.add_component(Label(self.content_x + half_w - 120, y + 12, val, "small", color))
+
+        # 2. 装备展示 (右侧)
+        equip_x = self.content_x + half_w + 20
+        self.ui_manager.add_component(Label(equip_x, self.content_y - 40, "当前穿搭", "normal", UIConfig.COLOR_YELLOW))
+        
+        slots = [
+            ("武器", "weapon", "weapons"),
+            ("头部", "head", "armors"),
+            ("身体", "armor", "armors")
+        ]
+        
+        slot_h = item_h * 1.6
+        for i, (slot_label, key, category) in enumerate(slots):
+            y = self.content_y + i * (slot_h + spacing)
+            # 插槽背景
+            self.ui_manager.add_component(Panel(equip_x, y, half_w, slot_h, (45, 45, 45, 255), UIConfig.COLOR_GRAY, 1, 12))
+            
+            # 槽位名
+            self.ui_manager.add_component(Label(equip_x + 15, y + 8, slot_label, "small", UIConfig.COLOR_GRAY))
+            
+            # 获取装备数据
+            item_id = self.game_state.equipped.get(key)
+            item_name = "未装备"
+            item_color = (100, 100, 100)
+            attr_text = "---"
+            
+            if item_id:
+                item_data = data_manager.equips.get(category, {}).get(item_id)
+                if item_data:
+                    item_name = item_data.get("name", item_id)
+                    item_color = UIConfig.COLOR_WHITE
+                    # 属性概览
+                    if category == "weapons":
+                        atk = item_data.get("atk", 0)
+                        attr_text = f"攻击 +{atk}"
+                    else:
+                        df = item_data.get("def", 0)
+                        spd = item_data.get("spd", 0)
+                        parts = []
+                        if df: parts.append(f"防御 +{df}")
+                        if spd: parts.append(f"速度 +{spd}")
+                        attr_text = " ".join(parts) if parts else "装饰品"
+            
+            # 装备名称和属性
+            self.ui_manager.add_component(Label(equip_x + 15, y + 35, item_name, "normal", item_color))
+            self.ui_manager.add_component(Label(equip_x + 15, y + 65, attr_text, "small", UIConfig.COLOR_GRAY_LIGHT))
 
     def _draw_inventory(self):
         # 背包网格建议 4x4 或 5x5

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="terrain" tilewidth="51" tileheight="101" tilecount="52" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="terrain" tilewidth="51" tileheight="101" tilecount="53" columns="0">
  <grid orientation="orthogonal" width="32" height="32"/>
  <tile id="164">
   <image source="../Tiles/terrain/Grass/shrub (11).png" width="32" height="15"/>
@@ -156,5 +156,8 @@
  </tile>
  <tile id="215">
   <image source="../Tiles/terrain/Grass/grl (1).png" width="32" height="32"/>
+ </tile>
+ <tile id="216">
+  <image source="../Tiles/terrain/Grass/rigt-bottom.png" width="32" height="32"/>
  </tile>
 </tileset>

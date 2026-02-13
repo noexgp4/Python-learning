@@ -24,7 +24,8 @@
         "skills": [
             "shotgun",
             "aim",
-            "Loading"
+            "Loading",
+            "Hawkeye"
         ],
         "sprite_path": "Assets/Image/Characters/character.png",
         "sprite_index": 0,

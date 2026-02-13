@@ -90,14 +90,23 @@ class BattleUI:
         self.draw_bar(base_x, base_y, player.hp, player.max_hp, (50, 200, 50), width=bar_w, label="HP")
         self.draw_bar(base_x, base_y + 45, player.mp, player.max_mp, player.theme_color, width=bar_w, label="MP")
 
-    def draw_enemy_status(self, enemies):
-        # 多怪状态显示：我们简单地在每个怪物头顶显示一个小血条
+    def draw_enemy_status(self, player, enemies):
+        # 鹰眼技能检测：如果玩家开启了鹰眼（持续回合 > 0）
+        hawkeye_state = player.get_skill_state("Hawkeye")
+        is_active = hawkeye_state.get("duration", 0) > 0
+        
+        # 获取锁定的目标
+        target_locked = getattr(player, "hawkeye_target", None)
+
+        if not is_active or not target_locked: 
+            return
+
+        # 仅显示被锁定目标的血条
         for enemy in enemies:
-            if enemy.hp <= 0: continue
-            
-            ex, ey = getattr(enemy, 'pos', (150, 250))
-            # 怪物头顶血条
-            self.draw_bar(ex, ey - 30, enemy.hp, enemy.max_hp, (200, 50, 50), width=100, height=8, label=None)
+            if enemy == target_locked and enemy.hp > 0:
+                ex, ey = getattr(enemy, 'pos', (150, 250))
+                # 怪物头顶血条
+                self.draw_bar(ex, ey - 30, enemy.hp, enemy.max_hp, (200, 50, 50), width=100, height=8, label=None)
 
     def draw_menu_grid(self, options, selected_idx, player_color):
         sw, sh = self.screen.get_width(), self.screen.get_height()
@@ -154,13 +163,27 @@ class BattleUI:
             is_selected = (i == selected_idx)
             can_afford = player.mp >= skill.get('cost', 0)
             
-            if not can_afford: color = (80, 80, 80)
-            elif is_selected: color = player.theme_color
-            else: color = (255, 255, 255)
+            # 获取技能冷却状态
+            skill_state = player.get_skill_state(skill['id'])
+            is_ready = player.is_skill_ready(skill['id'])
+            
+            if not can_afford or not is_ready: 
+                color = (80, 80, 80)
+            elif is_selected: 
+                color = player.theme_color
+            else: 
+                color = (255, 255, 255)
             
             skill_name = f"{'▶ ' if is_selected else ''}{skill['name']}"
-            self.draw_text(skill_name, (x, y), color, size="small" if len(skill_name)>6 else "normal")
-            self.draw_text(f"{skill.get('cost', 0)} MP", (x + col_w - 100, y + 4), color, "small")
+            
+            # 显示冷却或持续状态
+            if skill_state["duration"] > 0:
+                skill_name += f" (持续:{skill_state['duration']})"
+            elif skill_state["cd"] > 0:
+                skill_name += f" (CD:{skill_state['cd']})"
+                
+            self.draw_text(skill_name, (x, y), color, size="small" if len(skill_name)>10 else "normal")
+            self.draw_text(f"{skill.get('cost', 0)} MP", (x + col_w - 120, y + 4), color, "small")
 
     def update_and_draw_effects(self):
         for num in self.damage_numbers[:]:

@@ -344,9 +344,25 @@ def main():
                 update_res, update_data = scene_manager.current_scene.update(dt)
                 if update_res == "TELEPORT":
                     if current_game_state:
-                        current_game_state.current_map = update_data["map"]
-                        current_game_state.player_x = update_data["pos"][0]
-                        current_game_state.player_y = update_data["pos"][1]
+                        # 1. 记录当前地图的“离开点”
+                        # 使用 safe_pos（触发传送前的坐标），避免回来时直接踩在传送阵上
+                        old_map = current_game_state.current_map
+                        safe_x, safe_y = update_data.get("safe_pos", (world_scene.player.x, world_scene.player.y))
+                        current_game_state.map_return_points[old_map] = (safe_x, safe_y)
+                        
+                        # 2. 设置新地图
+                        target_map = update_data["map"]
+                        current_game_state.current_map = target_map
+                        
+                        # 3. 决定出生位置：如果是“返回”性质的传送且存过位置，则使用记录的位置
+                        if update_data.get("is_return") and target_map in current_game_state.map_return_points:
+                            rx, ry = current_game_state.map_return_points[target_map]
+                            current_game_state.player_x, current_game_state.player_y = rx, ry
+                            print(f"【传送】检测到返回属性，回到 {target_map} 的历史位置: ({rx}, {ry})")
+                        else:
+                            current_game_state.player_x = update_data["pos"][0]
+                            current_game_state.player_y = update_data["pos"][1]
+                        
                         start_loading("WORLD")
                 elif update_res == "BATTLE":
                     # 同步世界地图玩家属性到存档对象

@@ -191,10 +191,9 @@ class BattleScene:
         # 日志
         UIConfig.draw_center_text(self.screen, UIConfig.render_text(self.system.battle_log, "normal"), 50)
 
-        # 状态条与背景 - 这里的 UI 需要支持多怪列表
         target_sel = self.selected_index if self.current_menu == "TARGET" else -1
         self.ui.draw_character_portraits(self.player, self.enemies, target_sel)
-        self.ui.draw_enemy_status(self.enemies)
+        self.ui.draw_enemy_status(self.player, self.enemies)
         self.ui.draw_player_status(self.player)
 
         # 菜单绘制 (如果正在等待怪物行动，可以给菜单加个半透明遮罩表示不可用)

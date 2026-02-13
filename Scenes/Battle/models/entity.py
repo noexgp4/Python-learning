@@ -39,7 +39,42 @@ class Entity:
         
         # 状态效果
         self.status_effects = []
-    
+        
+        # 技能状态 (冷却和持续时间)
+        self.skill_states = {s['id']: {"cd": 0, "duration": 0} for s in self.skills}
+
+    def get_skill_state(self, skill_id):
+        return self.skill_states.get(skill_id, {"cd": 0, "duration": 0})
+
+    def is_skill_ready(self, skill_id):
+        state = self.get_skill_state(skill_id)
+        return state["cd"] <= 0 and state["duration"] <= 0
+
+    def start_skill_timer(self, skill_id, cooldown, duration=0):
+        if skill_id not in self.skill_states:
+            self.skill_states[skill_id] = {"cd": 0, "duration": 0}
+        
+        if duration > 0:
+            self.skill_states[skill_id]["duration"] = duration
+            self.skill_states[skill_id]["cd"] = 0 # 持续期间不计时冷却
+        else:
+            self.skill_states[skill_id]["cd"] = cooldown
+
+    def update_timers(self):
+        """每回合更新一次计时器"""
+        for skill_id, state in self.skill_states.items():
+            # 优先处理持续时间
+            if state["duration"] > 0:
+                state["duration"] -= 1
+                # 持续时间结束，由于冷却从结束开始算，我们需要在结束时填入冷却值
+                if state["duration"] == 0:
+                    # 查找技能原始数据获取冷却值
+                    from ..data.skills_library import SKILLS_LIB
+                    skill_info = SKILLS_LIB.get(skill_id, {})
+                    state["cd"] = skill_info.get("cooldown", 0)
+            elif state["cd"] > 0:
+                state["cd"] -= 1
+
     def add_status(self, status_id):
         """为实体添加状态效果"""
         if status_id not in [s['id'] for s in self.status_effects]:

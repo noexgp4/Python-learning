@@ -36,6 +36,7 @@
   </properties>
   <object id="2" x="544.454" y="544.788" width="31.0909" height="9.10227">
    <properties>
+    <property name="is_return" type="bool" value="true"/>
     <property name="target_map" value="testmap.tmx"/>
    </properties>
   </object>

@@ -35,6 +35,12 @@ class BattleSystem:
             attacker.aim_target = None
             return int(damage), 1
 
+        # --- 鹰眼 (Hawkeye) 逻辑 ---
+        if skill_id == "Hawkeye":
+            attacker.hawkeye_target = target
+            self.battle_log = f"{attacker.job_name} 开启鹰眼，锁定了 {target.name}！"
+            return 0, 1
+
         # --- 其他技能逻辑 ---
         repeat_times = 3 if (any(s['id'] == "greedy" for s in attacker.skills) and random.random() < 0.1) else 1
     
@@ -91,11 +97,26 @@ class BattleSystem:
             skill = {"name": "普通攻击", "type": "PHYSIC", "power": 0, "id": "basic_atk"}
         else:
             skill = attacker.active_skills[action_index]
+            skill_id = skill.get('id')
+            
+            # 1. 检查技能是否在冷却中或持续中
+            if not attacker.is_skill_ready(skill_id):
+                state = attacker.get_skill_state(skill_id)
+                if state["duration"] > 0:
+                    self.battle_log = f"技能 {skill['name']} 正在持续中！"
+                else:
+                    self.battle_log = f"技能 {skill['name']} 正在冷却中 ({state['cd']} 回合)！"
+                return {"status": "FAILED"}
+
+            # 2. 检查蓝耗
             cost = skill.get('cost', 0)
             if attacker.mp < cost:
                 self.battle_log = "魔法值不足！"
                 return {"status": "FAILED"}
             attacker.mp -= cost
+            
+            # 3. 启动计时器 (如果技能有 cd 或 duration)
+            attacker.start_skill_timer(skill_id, skill.get("cooldown", 0), skill.get("duration", 0))
         
         # 在执行前，如果玩家正在蓄力但还没释放（且动作不是 aim/attack），
         # 我们可以在这里处理蓄力的自然增长（如果玩家选择“跳过”或执行其他非攻击动作）
@@ -166,3 +187,8 @@ class BattleSystem:
                 self.battle_log = "全军覆没..."
             else:
                 self.state = "IDLE"
+                # 回合结束，更新所有实体的技能计时器
+                self.player.update_timers()
+                for enemy in self.enemies:
+                    if enemy.hp > 0:
+                        enemy.update_timers()

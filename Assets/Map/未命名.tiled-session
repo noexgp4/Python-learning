@@ -9,7 +9,8 @@
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "Building.tsx": {
             "dynamicWrapping": true,
@@ -48,8 +49,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 480.66666666666663,
-                "y": 318.66666666666663
+                "x": 480,
+                "y": 319.3333333333333
             }
         },
         "map2.tmx": {
@@ -71,23 +72,26 @@
         },
         "testmap.tmx": {
             "expandedObjectLayers": [
-                20,
-                26,
-                28,
-                21,
                 23,
-                25
+                25,
+                20,
+                28,
+                26,
+                21
             ],
             "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 440.5,
-                "y": 294
+                "x": 512,
+                "y": 511.5
             }
         },
         "testmap.tmx#Building": {
             "dynamicWrapping": false,
             "scaleInDock": 1
+        },
+        "testmap.tmx#Decorative items": {
+            "dynamicWrapping": true
         },
         "testmap.tmx#terrain": {
             "dynamicWrapping": false,
@@ -117,6 +121,8 @@
         "C:/Users/Suqb1/Downloads/TilesetGrass/map2.tmx",
         "map2.tmx"
     ],
+    "tileset.embedInMap": true,
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
-    "tileset.lastUsedFormat": "tsx"
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 1
 }
