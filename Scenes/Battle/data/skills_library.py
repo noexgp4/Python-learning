@@ -19,10 +19,18 @@ SKILLS_LIB = {
     "shotgun": {
         "id": "shotgun",
         "name": "霰弹枪",
+        "cost": 1,
+        "power": 20,
+        "cooldown": 0,
+        "desc": "射击目标弹射到后方玩家,后方玩家受到20%伤害,消耗1子弹"
+    },
+    "Revolver": {
+        "id": "Revolver",
+        "name": "左轮",
         "cost": 2,
         "power": 20,
         "cooldown": 0,
-        "desc": "射击目标弹射到后方玩家,消耗2子弹"
+        "desc": "对最近的随机目标进行两次快速射击,消耗2子弹"
     },
     "Loading": {
         "id": "Loading",
@@ -41,6 +49,15 @@ SKILLS_LIB = {
         "duration": 3,
         "desc": "进入鹰眼状态持续3回合,并可以查看到目标怪物的血量状态。"
     },
+    "magic_absorb": {
+        "id": "magic_absorb",
+        "name": "魔法吸收",
+        "cost": 0,
+        "power": 0,
+        "cooldown": 0,
+        "desc": "吸收目标100点魔法值,没有魔法值时造成伤害"
+    },
+    
     "basic_slash": {
         **BASE_PHYSIC,
         "id": "basic_slash",

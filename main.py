@@ -133,6 +133,10 @@ def main():
                         class_select_scene.update_selection(-1)
                     elif event.key == pygame.K_DOWN:
                         class_select_scene.update_selection(1)
+                    elif event.key == pygame.K_LEFT:
+                        class_select_scene.update_skill_selection(-1)
+                    elif event.key == pygame.K_RIGHT:
+                        class_select_scene.update_skill_selection(1)
                     elif event.key == pygame.K_RETURN:
                         selected_class = class_select_scene.class_names[class_select_scene.selected_index]
                         current_game_state = GameState(job_name=selected_class)

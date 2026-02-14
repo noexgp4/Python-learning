@@ -49,7 +49,7 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 480,
+                "x": 479.99999999999994,
                 "y": 319.3333333333333
             }
         },
@@ -71,19 +71,23 @@
             "scaleInEditor": 1.5
         },
         "testmap.tmx": {
-            "expandedObjectLayers": [
-                23,
-                25,
-                20,
-                28,
-                26,
-                21
+            "expandedGroupLayers": [
+                41,
+                40
             ],
-            "scale": 1,
-            "selectedLayer": 3,
+            "expandedObjectLayers": [
+                25,
+                28,
+                20,
+                21,
+                23,
+                26
+            ],
+            "scale": 0.75,
+            "selectedLayer": 13,
             "viewCenter": {
-                "x": 512,
-                "y": 511.5
+                "x": 511.99999999999994,
+                "y": 511.3333333333333
             }
         },
         "testmap.tmx#Building": {
@@ -91,7 +95,8 @@
             "scaleInDock": 1
         },
         "testmap.tmx#Decorative items": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 1
         },
         "testmap.tmx#terrain": {
             "dynamicWrapping": false,

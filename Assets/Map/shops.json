@@ -18,5 +18,13 @@
             "book_fireball"
         ],
         "discounts": 0.8
+    },
+    "blacksmith_shop": {
+        "name": "铁匠铺",
+        "shop_id": "blacksmith_shop",
+        "inventory": [
+            "leather_armor"
+        ],
+        "discounts": 1.0
     }
 }

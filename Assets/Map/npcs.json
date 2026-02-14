@@ -1,27 +1,40 @@
 {
     "npc_smith_01": {
         "name": "铁匠雷恩",
-        "sprite": "NPC_test.png",
+        "npc_id": "npc_smith_01",
+        "sprite": "NPC_test-sheet.png",
         "dialogue": [
             "嘿，要打磨你的剑吗？",
             "这附近怪石很多，小心点。"
         ],
-        "shop_id": "basic_weapon_shop"
+        "features": [
+            "talk",
+            "trade",
+            "craft"
+        ],
+        "shop_id": "blacksmith_shop"
     },
     "npc_villager_01": {
         "name": "路人甲",
-        "sprite": "NPC_test.png",
+        "sprite": "NPC_test-sheet.png",
         "dialogue": [
             "今天天气不错。"
         ],
-        "shop_id": null
+        "features": [
+            "talk"
+        ]
     },
     "old_man_02": {
         "name": "多恩老爹",
-        "sprite": "NPC_test.png",
+        "sprite": "NPC_test-sheet.png",
         "dialogue": [
             "欢迎来到我的武器店！",
             "出门在外，一件趁手的兵器非常重要。"
+        ],
+        "features": [
+            "talk",
+            "trade",
+            "craft"
         ],
         "shop_id": "village_weapon_shop"
     }
